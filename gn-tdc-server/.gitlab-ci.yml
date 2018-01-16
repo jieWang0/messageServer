@@ -1,0 +1,140 @@
+image: 172.16.1.99/transwarp/base/builder:centos7
+
+before_script:
+    - time=`date "+%Y-%m-%d-%H-%M-%S"`
+    - imageTag="${CI_COMMIT_REF_NAME}-${time}-${CI_COMMIT_SHA}"
+    - export IMAGE_TAG=${imageTag}
+    - export BUILD_IMAGE="Y"
+    - export DEPLOY_JAR="Y"
+    - if [ "${CI_COMMIT_REF_NAME}" = "master" ]; then
+    -   export BRANCH_NAME="tdc-1.0"
+    - else
+    -   export BRANCH_NAME="${CI_COMMIT_REF_NAME}"
+    - fi
+    - export COMPONENT_BASE="${CI_PROJECT_NAME}"
+    - export DEV_ROOT=`pwd`
+    - export DOCKER_REPO_URL="172.16.1.99"
+    - export OSINFO="centos-6"
+    - export JAVA_HOME=/usr/jdk-8u131-linux-x64.tar/jdk1.8.0_131
+    - export PATH=/usr/jdk-8u131-linux-x64.tar/jdk1.8.0_131/bin:$PATH
+    - java -version
+
+stages:
+  - precommit_build
+  - postcommit_build
+  - gold_build
+
+precommit_build:
+  stage: precommit_build
+  script:
+    - set -ex
+    - git clone http://gitlab-ci-token:${CI_JOB_TOKEN}@172.16.1.41:10080/InfraTools/base_project.git base_project
+    - cp base_project/settings_postcommit.xml /root/.m2/settings.xml
+    - mvn clean package -DskipTests
+  only:
+    - /.*_devel_\d+/
+    - /.*_master_\d+/
+  
+postcommit_build:
+  stage: postcommit_build
+  script:
+    - startdocker.sh &
+    - set -ex
+    - sleep 90s
+    - export BUILDER="postcommit"
+    - export releaseStagingId="priv-transwarp-lib"
+    - export releaseRepoName="libs-release-local"
+    - export releaseRepoUrl="http://172.16.1.161:30033/repository/libs-release-local"
+    - export snapStagingId="priv-transwarp-snapshots"
+    - export snapRepoName="libs-snapshot"
+    - export snapRepoUrl="http://172.16.1.161:30033/repository/libs-snapshot-local"
+    - git clone http://gitlab-ci-token:${CI_JOB_TOKEN}@172.16.1.41:10080/InfraTools/packageRelease.git script
+    - git clone http://gitlab-ci-token:${CI_JOB_TOKEN}@172.16.1.41:10080/InfraTools/base_project.git base_project
+    - cp base_project/settings_postcommit.xml /root/.m2/settings.xml
+    - cp build_script/deploy/deploy_${CI_PROJECT_NAME}.sh script/build_utils/deploy/deploy_${CI_PROJECT_NAME}.sh
+    - cp build_script/image/build_${CI_PROJECT_NAME}.sh script/build_utils/image/build_${CI_PROJECT_NAME}.sh
+    - mkdir -p ~/.docker && cp /root/.docker/config.json ~/.docker
+    - bash -x script/jenkins_job_build.sh #should use bash here, otherwise will cause error (sh doesn't support function name with '-' but bash does) run build_ticket.sh
+    - docker tag ${DOCKER_REPO_URL}/${BUILDER}/tcc:${IMAGE_TAG} ${DOCKER_REPO_URL}/${BUILDER}/tcc:${BRANCH_NAME}
+    - docker push ${DOCKER_REPO_URL}/${BUILDER}/tcc:${BRANCH_NAME}
+    - ps aux | grep docker | grep -v "grep" |  awk '{print $2}' | xargs kill -9
+  only:
+    - master
+  tags:
+    - k8s
+
+gold_build:
+  stage: gold_build
+  script:
+    - startdocker.sh &
+    - set -ex
+    - sleep 90s
+    - export BUILDER="gold"
+    - export releaseStagingId="public-transwarp-release"
+    - export releaseRepoName="libs-release-local"
+    - export releaseRepoUrl="http://172.16.1.168:8081/artifactory/libs-release-local"
+    - export snapStagingId="public-transwarp-snapshots"
+    - export snapRepoName="libs-snapshot"
+    - export snapRepoUrl="http://172.16.1.168:8081/artifactory/libs-snapshot-local"
+    - git clone http://gitlab-ci-token:${CI_JOB_TOKEN}@172.16.1.41:10080/InfraTools/packageRelease.git script
+    - git clone http://gitlab-ci-token:${CI_JOB_TOKEN}@172.16.1.41:10080/InfraTools/base_project.git base_project
+    - cp base_project/settings_gold.xml /root/.m2/settings.xml
+    - cp build_script/deploy/deploy_${CI_PROJECT_NAME}.sh script/build_utils/deploy/deploy_${CI_PROJECT_NAME}.sh
+    - cp build_script/image/build_${CI_PROJECT_NAME}.sh script/build_utils/image/build_${CI_PROJECT_NAME}.sh
+    - mkdir -p ~/.docker && cp /root/.docker/config.json ~/.docker
+    - bash -x script/jenkins_job_build.sh #should use bash here, otherwise will cause error (sh doesn't support function name with '-' but bash does)
+    - docker tag ${DOCKER_REPO_URL}/${BUILDER}/tcc:${IMAGE_TAG} ${DOCKER_REPO_URL}/${BUILDER}/tcc:${BRANCH_NAME}
+    - docker push ${DOCKER_REPO_URL}/${BUILDER}/tcc:${BRANCH_NAME}
+    - ps aux | grep docker | grep -v "grep" |  awk '{print $2}' | xargs kill -9
+  only:
+    - master
+  tags:
+    - k8s
+
+#maven_package:
+#  stage: build
+#  tags:
+#    - k8s
+#  only:
+#    - devel
+#  script:
+#    - >
+#      (
+#      set -e;
+#      mvn clean package -B -DskipTests
+#      )
+#  after_script:
+#    - echo "maven package done"
+#
+#
+#unit_test:
+#  stage: build
+#  tags:
+#    - k8s
+#  only:
+#    - master
+#  script:
+#    - >
+#      (
+#      set -e;
+#      mvn clean test
+#      )
+#  after_script:
+#    - echo "maven clean done"
+#
+#image_build:
+#  stage: deploy
+#  tags:
+#    - k8s
+#  only:
+#    - master
+#  script:
+#    - >
+#      (
+#      set -e;
+#      curl -L -H 'PRIVATE-TOKEN: TN42eT8KyzNs4zKmwDeo' -o frontend.zip http://172.16.1.41:10080/TDC/tcc-frontend/-/jobs/artifacts/master/download?job=postcommit;
+#      unzip frontend.zip && cp -rp dist/* web/src/main/resources/static/ && rm -rf dist frontend.zip;
+#      mvn clean package -DskipTests
+#      )
+#  after_script:
+#    - echo "deploy done"
