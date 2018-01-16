@@ -1,0 +1,69 @@
+image: 172.16.1.99/transwarp/base/builder:centos7
+
+before_script:
+    - java -version
+
+stages:
+  - precommit_build
+
+precommit_build:
+  stage: precommit_build
+  script:
+    - set -ex
+    - git clone http://gitlab-ci-token:${CI_JOB_TOKEN}@172.16.1.41:10080/InfraTools/base_project.git base_project
+    - cp base_project/settings_postcommit.xml /root/.m2/settings.xml
+    - mvn clean package -DskipTests
+
+  only:
+    - master
+  tags:
+    - k8s
+
+
+#maven_package:
+#  stage: build
+#  tags:
+#    - k8s
+#  only:
+#    - devel
+#  script:
+#    - >
+#      (
+#      set -e;
+#      mvn clean package -B -DskipTests
+#      )
+#  after_script:
+#    - echo "maven package done"
+#
+#
+#unit_test:
+#  stage: build
+#  tags:
+#    - k8s
+#  only:
+#    - master
+#  script:
+#    - >
+#      (
+#      set -e;
+#      mvn clean test
+#      )
+#  after_script:
+#    - echo "maven clean done"
+#
+#image_build:
+#  stage: deploy
+#  tags:
+#    - k8s
+#  only:
+#    - master
+#  script:
+#    - >
+#      (
+#      set -e;
+#      curl -L -H 'PRIVATE-TOKEN: TN42eT8KyzNs4zKmwDeo' -o frontend.zip http://172.16.1.41:10080/TDC/tcc-frontend/-/jobs/artifacts/master/download?job=postcommit;
+#      unzip frontend.zip && cp -rp dist/* web/src/main/resources/static/ && rm -rf dist frontend.zip;
+#      mvn clean package -DskipTests
+#      )
+#  after_script:
+#    - echo "deploy done"
