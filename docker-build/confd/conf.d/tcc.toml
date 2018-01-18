@@ -1,0 +1,11 @@
+[[template]]
+src = "application.yml.tmpl"
+dest = "/etc/tcc/conf/application.yml"
+mode = "0664"
+check_cmd = "/bin/true"
+
+[[template]]
+src = "guardian-site.xml.tmpl"
+dest = "/etc/tcc/conf/guardian-site.xml"
+mode = "0664"
+check_cmd = "/bin/true"

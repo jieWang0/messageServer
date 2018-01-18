@@ -1,0 +1,183 @@
+# server settings
+server:
+  port: 9042
+  session:
+    cookie:
+      name: TCCSESSIONID
+      max-age: 86400
+  tomcat:
+    accesslog:
+      enabled: true
+      directory: /var/log/tcc
+
+# mybatis settings
+mybatis:
+  type-aliases-package: io.transwarp.tcc.persistence.model,io.transwarp.tcc.persistence.handler,io.transwarp.tcc.persistence.specialhandler,io.transwarp.tcc.persistence.model,io.transwarp.tcc.persistence.handler,io.transwarp.tcc.persistence.specialhandler,io.transwarp.tcc.persistence.pojo
+  type-handlers-package: io.transwarp.tcc.persistence.handler
+  mapper-locations: [
+    "classpath*:config/mapper/*.xml"
+  ]
+
+# without flyway, we need to enable DDL initialization via Spring
+spring.datasource:
+  #url: jdbc:h2:mem:tccdb;DB_CLOSE_DELAY=-1
+  url: jdbc:mysql://{{ getenv "TCC_TXSQL_SERVER" "localhost" }}:{{ getenv "TCC_TXSQL_PORT" "3306" }}/{{ getenv "TCC_TXSQL_DB" "tcc"}}?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai
+  username: {{ getenv "TCC_TXSQL_USERNAME" "root" }}
+  password: {{ getenv "TCC_TXSQL_PASSWORD" "123456" }}
+# flyway integration
+management.security.enabled: false
+spring.jpa.hibernate.ddl-auto: validate
+
+tdc:
+  service:
+    location: {{ getenv "TDC_SERVER_URL"  "" }}
+
+# general settings of tenant, initialized by ignitor
+tenant:
+  uid: {{ getenv "TCC_TENANT_UID" "" }}
+  network.name: {{ getenv "TCC_NETWORK_NAME" "" }}
+  network.address: {{ getenv "TCC_NETWORK_ADDRESS" "default" }}
+  defaultQuota:
+    cpu: {{ getenv "TCC_DEFAULT_QUOTA_CPU" "100" }}
+    memory: {{ getenv "TCC_DEFAULT_QUOTA_MEMORY" "1024GiB" }}
+    storage: {{ getenv "TCC_DEFAULT_QUOTA_STORAGE" "20TiB" }}
+    network: {{ getenv "TCC_DEFAULT_QUOTA_NETWORK" "30" }}
+
+# the cluster address use for calling wormhole service
+k8s.cluster.address: {{ getenv "K8S_CLUSTER_ADDRESS" "default" }}
+
+# app settings
+spring.application.name: "tcc"
+
+# thymeleaf settings
+spring.thymeleaf.mode: LEGACYHTML5
+
+# ignitor, just a trick now
+ignitor:
+  service:
+    location: {{ getenv "IGNITOR_SERVER_URL" ""}}
+    loggingLevel: BODY
+    timeoutEnabled: true
+    timeoutInMillis: 20000
+    circuitBreakerEnabled: true
+    circuitBreakerRollingWindowMillis: 30000
+    circuitBreakerSleepWindowMillis: 30000
+    circuitBreakerErrorPercentage: 80
+    circuitBreakerErrorVolume: 100
+
+# ockle setting
+ockle.service:
+  location: {{ getenv "OCKLE_SERVER_URL" "" }}
+  loggingLevel: BODY
+  timeoutEnabled: true
+  timeoutInMillis: 20000
+  circuitBreakerEnabled: true
+  circuitBreakerRollingWindowMillis: 30000
+  circuitBreakerSleepWindowMillis: 30000
+  circuitBreakerErrorPercentage: 80
+  circuitBreakerErrorVolume: 100
+
+# wormhole setting
+wormhole.service:
+  location: {{ getenv "WORMHOLE_SERVER_URL" "" }}
+  loggingLevel: BODY
+  timeoutEnabled: true
+  timeoutInMillis: 20000
+  circuitBreakerEnabled: true
+  circuitBreakerRollingWindowMillis: 30000
+  circuitBreakerSleepWindowMillis: 30000
+  circuitBreakerErrorPercentage: 80
+  circuitBreakerErrorVolume: 100
+  ignoreUnknownProperties: {{ getenv "WORMHOLE_IGNORE_UNKNOWN_PROPERTIES" "true" }}
+
+# simmail setting
+simmail.service:
+  location: {{ getenv "SIMMAIL_SERVER_URL" "" }}
+  loggingLevel: BODY
+  timeoutEnabled: true
+  timeoutInMillis: 20000
+  circuitBreakerEnabled: true
+  circuitBreakerRollingWindowMillis: 30000
+  circuitBreakerSleepWindowMillis: 30000
+  circuitBreakerErrorPercentage: 80
+  circuitBreakerErrorVolume: 100
+
+# ticket setting
+ticket.service:
+  location: {{ getenv "TICKET_SERVER_URL" "" }}
+  loggingLevel: BODY
+  timeoutEnabled: true
+  timeoutInMillis: 20000
+  circuitBreakerEnabled: true
+  circuitBreakerRollingWindowMillis: 30000
+  circuitBreakerSleepWindowMillis: 30000
+  circuitBreakerErrorPercentage: 80
+  circuitBreakerErrorVolume: 100
+
+# abacus setting
+abacus.service:
+  location: {{ getenv "TENON_SERVER_URL" "" }}
+  loggingLevel: BODY
+  timeoutEnabled: true
+  timeoutInMillis: 20000
+  circuitBreakerEnabled: true
+  circuitBreakerRollingWindowMillis: 30000
+  circuitBreakerSleepWindowMillis: 30000
+  circuitBreakerErrorPercentage: 80
+  circuitBreakerErrorVolume: 100
+
+
+# cas settings
+proxy.cas.prefix: {{ getenv "CAS_SERVER_URL" "" }}
+proxy.app.prefix: {{ getenv "TCC_SERVER_URL" "" }}
+
+public.app.prefix: {{ getenv "TCC_SERVER_PUBLIC_URL" "" }}
+
+# cas settings
+# the `server` means the server which performs user authentication
+# the `client` means the application side which receives authentication
+cas:
+  server:
+    prefix: "${proxy.cas.prefix}"
+    login: "${proxy.cas.prefix}/login"
+    logout: "${proxy.cas.prefix}/logout"
+  client:
+    home: "${proxy.app.prefix}"
+    login-path: "/api/v1/login"
+    logout-path: "/api/v1/logout"
+    proxy-path: "/api/v1/proxyreceptor"
+
+# logging setting
+logging.level:
+  root: INFO
+
+# jmx
+jmx.rmi.host: localhost
+jmx.rmi.port: 8028
+jmx.rmi.enabled: false
+
+kafka:
+  consumer:
+    bootstrap-servers: {{ getenv "NOTIFICATION_KAFKA_URL" "" }}
+    group: tcc
+
+ws.stompEndpoint: /ws/connect
+ws.inboundMatcher: /ws/**
+ws.brokerPath: /ws/notifications
+ws.appPrefix: /ws/app
+
+instance:
+  # the minimum node number of creating a instance
+  minNodes: 3
+  # the maximum node number of creating a instance
+  maxNodes: 100
+
+flyway:
+  baseline-on-migrate: true
+
+endpoints:
+  trace:
+    enabled: true
+    sensitive: false
+  prometheus:
+    sensitive: false
