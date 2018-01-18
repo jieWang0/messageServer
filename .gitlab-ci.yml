@@ -56,8 +56,8 @@ postcommit_build:
     - cp build_script/image/build_${CI_PROJECT_NAME}.sh script/build_utils/image/build_${CI_PROJECT_NAME}.sh
     - mkdir -p ~/.docker && cp /root/.docker/config.json ~/.docker
     - bash -x script/jenkins_job_build.sh #should use bash here, otherwise will cause error (sh doesn't support function name with '-' but bash does) run build_ticket.sh
-    - docker tag ${DOCKER_REPO_URL}/${BUILDER}/{CI_PROJECT_NAME}:${IMAGE_TAG} ${DOCKER_REPO_URL}/${BUILDER}/{CI_PROJECT_NAME}:${BRANCH_NAME}
-    - docker push ${DOCKER_REPO_URL}/${BUILDER}/{CI_PROJECT_NAME}:${BRANCH_NAME}
+    - docker tag ${DOCKER_REPO_URL}/${BUILDER}/${CI_PROJECT_NAME}:${IMAGE_TAG} ${DOCKER_REPO_URL}/${BUILDER}/{CI_PROJECT_NAME}:${BRANCH_NAME}
+    - docker push ${DOCKER_REPO_URL}/${BUILDER}/${CI_PROJECT_NAME}:${BRANCH_NAME}
     - ps aux | grep docker | grep -v "grep" |  awk '{print $2}' | xargs kill -9
   only:
     - master
