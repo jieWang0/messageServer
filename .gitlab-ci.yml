@@ -42,7 +42,7 @@ postcommit_build:
     - startdocker.sh &
     - set -ex
     - sleep 90s
-    - export BUILDER="jiewang"
+    - export BUILDER="postcommit"
     - export releaseStagingId="priv-transwarp-lib"
     - export releaseRepoName="libs-release-local"
     - export releaseRepoUrl="http://172.16.1.161:30033/repository/libs-release-local"
