@@ -11,6 +11,7 @@ before_script:
     - else
     -   export BRANCH_NAME="${CI_COMMIT_REF_NAME}"
     - fi
+    - export CI_PROJECT_NAME="gn-tdc-server"
     - export COMPONENT_BASE="${CI_PROJECT_NAME}"
     - export DEV_ROOT=`pwd`
     - export DOCKER_REPO_URL="172.16.1.99"

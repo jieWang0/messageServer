@@ -23,6 +23,28 @@
         <relativePath/>
     </parent>
 
+    <properties>
+        <java.version>1.8</java.version>
+        <shiro.version>1.3.2</shiro.version>
+        <guardian.version>2.0-transwarp-5.1.0</guardian.version>
+        <simmail.version>0.0.1-SNAPSHOT</simmail.version>
+        <ticket.version>0.0.1-SNAPSHOT</ticket.version>
+        <spring.kafka.version>1.2.2.RELEASE</spring.kafka.version>
+        <notification.version>1.0-transwarp-5.1.0-SNAPSHOT</notification.version>
+        <prometheus.version>0.1.0</prometheus.version>
+
+        <distMgmtStagingId>transwarp-release</distMgmtStagingId>
+        <distMgmtStagingName>public-libs-release-local</distMgmtStagingName>
+        <distMgmtStagingUrl>http://172.16.1.168:8081/artifactory/libs-release-local</distMgmtStagingUrl>
+        <distMgmtSnapshotsId>transwarp-snapshots</distMgmtSnapshotsId>
+        <distMgmtSnapshotsName>public-libs-snapshot-local</distMgmtSnapshotsName>
+        <distMgmtSnapshotsUrl>http://172.16.1.168:8081/artifactory/libs-snapshot-local</distMgmtSnapshotsUrl>
+
+        <docker.user>jenkins</docker.user>
+        <docker.imageName>gn-tdc-server</docker.imageName>
+        <skipDockerBuild>false</skipDockerBuild>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
