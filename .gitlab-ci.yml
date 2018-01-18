@@ -14,7 +14,7 @@ before_script:
     - export CI_PROJECT_NAME="gn-tdc-server"
     - export COMPONENT_BASE="${CI_PROJECT_NAME}"
     - export DEV_ROOT=`pwd`
-    - export DOCKER_REPO_URL="registry.cn-hangzhou.aliyuncs.com/jiewang/strings"
+    - export DOCKER_REPO_URL="172.16.1.99"
     - export OSINFO="centos-6"
     - export JAVA_HOME=/usr/jdk-8u131-linux-x64.tar/jdk1.8.0_131
     - export PATH=/usr/jdk-8u131-linux-x64.tar/jdk1.8.0_131/bin:$PATH
