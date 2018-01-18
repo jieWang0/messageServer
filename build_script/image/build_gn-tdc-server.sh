@@ -41,7 +41,7 @@ mvn clean package \
 #生成docker镜像
 docker build . -t jenkins/tcc:latest
 
-docker tag jenkins/tcc:latest ${DOCKER_REPO_URL}/${BUILDER}/tcc:${IMAGE_TAG}
-docker push ${DOCKER_REPO_URL}/${BUILDER}/tcc:${IMAGE_TAG}
+docker tag jenkins/gn-tdc-server:latest ${DOCKER_REPO_URL}/${BUILDER}/gn-tdc-server:${IMAGE_TAG}
+docker push ${DOCKER_REPO_URL}/${BUILDER}/gn-tdc-server:${IMAGE_TAG}
 
 }
