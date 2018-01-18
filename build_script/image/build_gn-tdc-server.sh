@@ -28,7 +28,7 @@ fi
 #    rm web/src/main/resources/static/index.html
 #fi
 
-
+echo "11111111122222222"
 mvn clean package \
 -DskipTests ${encryptOpt} \
 -DdistMgmtStagingId=${releaseStagingId} \
@@ -39,7 +39,7 @@ mvn clean package \
 -DdistMgmtSnapshotsUrl=${snapRepoUrl}
 
 #生成docker镜像
-docker build . -t jenkins/tcc:latest
+docker build . -t jenkins/gn-tdc-server:latest
 
 docker tag jenkins/gn-tdc-server:latest ${DOCKER_REPO_URL}/${BUILDER}/gn-tdc-server:${IMAGE_TAG}
 docker push ${DOCKER_REPO_URL}/${BUILDER}/gn-tdc-server:${IMAGE_TAG}

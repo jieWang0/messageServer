@@ -7,10 +7,10 @@ before_script:
     - export BUILD_IMAGE="Y"
     - export DEPLOY_JAR="Y"
     - if [ "${CI_COMMIT_REF_NAME}" = "master" ]; then
-    -   export BRANCH_NAME="tdc-1.0"
+    -   export BRANCH_NAME="gn-tdc-server-1.0"
     - else
     -   export BRANCH_NAME="${CI_COMMIT_REF_NAME}"
-    - fi
+    -
     - export COMPONENT_BASE="${CI_PROJECT_NAME}"
     - export DEV_ROOT=`pwd`
     - export DOCKER_REPO_URL="172.16.1.99"
@@ -55,8 +55,8 @@ postcommit_build:
     - cp build_script/image/build_${CI_PROJECT_NAME}.sh script/build_utils/image/build_${CI_PROJECT_NAME}.sh
     - mkdir -p ~/.docker && cp /root/.docker/config.json ~/.docker
     - bash -x script/jenkins_job_build.sh #should use bash here, otherwise will cause error (sh doesn't support function name with '-' but bash does) run build_ticket.sh
-    - docker tag ${DOCKER_REPO_URL}/${BUILDER}/tcc:${IMAGE_TAG} ${DOCKER_REPO_URL}/${BUILDER}/tcc:${BRANCH_NAME}
-    - docker push ${DOCKER_REPO_URL}/${BUILDER}/tcc:${BRANCH_NAME}
+    - docker tag ${DOCKER_REPO_URL}/${BUILDER}/${CI_PROJECT_NAME}:${IMAGE_TAG} ${DOCKER_REPO_URL}/${BUILDER}/${CI_PROJECT_NAME}:${BRANCH_NAME}
+    - docker push ${DOCKER_REPO_URL}/${BUILDER}/${CI_PROJECT_NAME}:${BRANCH_NAME}
     - ps aux | grep docker | grep -v "grep" |  awk '{print $2}' | xargs kill -9
   only:
     - master
@@ -83,8 +83,8 @@ gold_build:
     - cp build_script/image/build_${CI_PROJECT_NAME}.sh script/build_utils/image/build_${CI_PROJECT_NAME}.sh
     - mkdir -p ~/.docker && cp /root/.docker/config.json ~/.docker
     - bash -x script/jenkins_job_build.sh #should use bash here, otherwise will cause error (sh doesn't support function name with '-' but bash does)
-    - docker tag ${DOCKER_REPO_URL}/${BUILDER}/tcc:${IMAGE_TAG} ${DOCKER_REPO_URL}/${BUILDER}/tcc:${BRANCH_NAME}
-    - docker push ${DOCKER_REPO_URL}/${BUILDER}/tcc:${BRANCH_NAME}
+    - docker tag ${DOCKER_REPO_URL}/${BUILDER}/${CI_PROJECT_NAME}:${IMAGE_TAG} ${DOCKER_REPO_URL}/${BUILDER}/${CI_PROJECT_NAME}:${BRANCH_NAME}
+    - docker push ${DOCKER_REPO_URL}/${BUILDER}/${CI_PROJECT_NAME}:${BRANCH_NAME}
     - ps aux | grep docker | grep -v "grep" |  awk '{print $2}' | xargs kill -9
   only:
     - master

@@ -3,24 +3,24 @@ MAINTAINER zhe.jiang@transwarp.io
 
 WORKDIR /root
 
-ENV TCC_LOG_DIR=/var/log/tcc \
-    TCC_CONF_DIR=/etc/tcc/conf \
-    TCC_HOME=/usr/lib/tcc \
-    TCC_BIN_DIR=/var/lib/tcc/bin \
-    TCC_LIB_DIR=/var/lib/tcc/lib \
-    TCC_CONFD_DIR=/var/lib/tcc/confd
+ENV GN_LOG_DIR=/var/log/gn \
+    GN_CONF_DIR=/etc/gn/conf \
+    GN_HOME=/usr/lib/gn \
+    GN_BIN_DIR=/var/lib/gn/bin \
+    GN_LIB_DIR=/var/lib/gn/lib \
+    GN_CONFD_DIR=/var/lib/gn/confd
 
 # initialize file hierarchy
-RUN mkdir -p $TCC_CONF_DIR && \
-    mkdir -p $TCC_LOG_DIR && \
-    mkdir -p $TCC_HOME && \
-    mkdir -p $TCC_BIN_DIR && \
-    mkdir -p $TCC_LIB_DIR && \
-    mkdir -p $TCC_CONFD_DIR && \
+RUN mkdir -p $GN_CONF_DIR && \
+    mkdir -p $GN_LOG_DIR && \
+    mkdir -p $GN_HOME && \
+    mkdir -p $GN_BIN_DIR && \
+    mkdir -p $GN_LIB_DIR && \
+    mkdir -p $GN_CONFD_DIR && \
     mkdir -p /etc/confd
 
 # add trusted.jks
-ADD trusted.jks /var/lib/tcc/lib/
+#ADD trusted.jks /var/lib/tcc/lib/
 
 # add confd+nginx
 #ADD confd /usr/bin/confd
@@ -33,14 +33,15 @@ ADD trusted.jks /var/lib/tcc/lib/
 # commented by wzy. cause no proxy need in image
 
 # add confd+configuration
-ADD docker-build/confd $TCC_CONFD_DIR
+ADD docker-build/confd $GN_CONFD_DIR
 
 # add boot scripts
-ADD docker-build/bin $TCC_BIN_DIR
+ADD docker-build/bin $GN_BIN_DIR
 
 # final step is to add application jar file
-ADD web/target/tcc-web-0.0.1-SNAPSHOT.jar $TCC_LIB_DIR/tcc.jar
+ADD gn-tdc-server/gn-tdc-server-1.0-SNAPSHOT.jar $GN_LIB_DIR/ng-tdc-server.jar
 
-RUN mv $TCC_BIN_DIR/boot.sh /bin/
+RUN mv $GN_BIN_DIR/boot.sh /bin/
 
-ENTRYPOINT ["/bin/boot.sh"]
+#ENTRYPOINT ["/bin/boot.sh"]
+ENTRYPOINT ["java","-jar","/gn-server.jar"]

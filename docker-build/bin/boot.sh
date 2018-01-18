@@ -50,8 +50,8 @@ fi
 ${javaExec} -cp . \
 ${JAVA_D_ARGS} \
 ${JAVA_VM_ARGS} \
--Dloader.path=/etc/tcc/conf \
+-Dloader.path=/etc/gn/conf \
 -Dserver.port="${TCC_SERVER_PORT}" \
 -Djavax.net.ssl.trustStore="${CAS_JKS_PATH}" \
 -Djavax.net.ssl.trustStorePassword="${CAS_PASSWD}" \
--jar /var/lib/tcc/lib/tcc.jar
+-jar /var/lib/tcc/lib/ng-tdc-server.jar

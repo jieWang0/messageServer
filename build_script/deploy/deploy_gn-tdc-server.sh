@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 
-function deploy_tcc-backend {
+function deploy_gn-tdc-server {
 set -ex
 
-#cd tcc-backend
 
 mvn clean deploy -DskipTests \
 -DdistMgmtStagingId=${releaseStagingId} \
