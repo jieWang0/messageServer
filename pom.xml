@@ -45,6 +45,33 @@
         <skipDockerBuild>false</skipDockerBuild>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>${distMgmtStagingId}</id>
+            <!-- This should be at top, it makes maven try the central repo first and then others and hence faster dep resolution -->
+            <name>${distMgmtStagingName}</name>
+            <url>${distMgmtStagingUrl}</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+    <distributionManagement>
+        <snapshotRepository>
+            <id>${distMgmtSnapshotsId}</id>
+            <name>${distMgmtSnapshotsName}</name>
+            <url>${distMgmtSnapshotsUrl}</url>
+        </snapshotRepository>
+        <repository>
+            <id>${distMgmtStagingId}</id>
+            <name>${distMgmtStagingName}</name>
+            <url>${distMgmtStagingUrl}</url>
+        </repository>
+    </distributionManagement>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
