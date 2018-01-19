@@ -39,7 +39,7 @@ ADD docker-build/confd $GN_CONFD_DIR
 ADD docker-build/bin $GN_BIN_DIR
 
 # final step is to add application jar file
-ADD gn-tdc-server/gn-tdc-server-1.0-SNAPSHOT.jar $GN_LIB_DIR/ng-tdc-server.jar
+ADD gn-tdc-server/target/gn-tdc-server-1.0-SNAPSHOT.jar $GN_LIB_DIR/ng-tdc-server.jar
 
 RUN mv $GN_BIN_DIR/boot.sh /bin/
 
