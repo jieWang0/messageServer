@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-function build_tcc-backend {
+function build_gn-tdc-server {
 
 encryptOpt=""
 
@@ -28,7 +28,7 @@ fi
 #    rm web/src/main/resources/static/index.html
 #fi
 
-echo "11111111122222222"
+echo "begin build##############"
 mvn clean package \
 -DskipTests ${encryptOpt} \
 -DdistMgmtStagingId=${releaseStagingId} \
