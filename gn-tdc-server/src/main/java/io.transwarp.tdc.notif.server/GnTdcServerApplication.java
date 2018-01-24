@@ -9,11 +9,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class GnTdcServerApplication {
 
-    @RequestMapping("/")
-    public String home() {
-        return "docker部署测试";
-    }
-
     public static void main(String[] args) {
         SpringApplication.run(GnTdcServerApplication.class, args);
     }
