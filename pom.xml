@@ -16,5 +16,108 @@
         <module>gn-schema</module>
     </modules>
 
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>1.3.3.RELEASE</version>
+        <relativePath/>
+    </parent>
+
+    <properties>
+        <java.version>1.8</java.version>
+        <shiro.version>1.3.2</shiro.version>
+        <guardian.version>2.0-transwarp-5.1.0</guardian.version>
+        <simmail.version>0.0.1-SNAPSHOT</simmail.version>
+        <ticket.version>0.0.1-SNAPSHOT</ticket.version>
+        <spring.kafka.version>1.2.2.RELEASE</spring.kafka.version>
+        <notification.version>1.0-transwarp-5.1.0-SNAPSHOT</notification.version>
+        <prometheus.version>0.1.0</prometheus.version>
+
+        <distMgmtStagingId>transwarp-release</distMgmtStagingId>
+        <distMgmtStagingName>public-libs-release-local</distMgmtStagingName>
+        <distMgmtStagingUrl>http://172.16.1.168:8081/artifactory/libs-release-local</distMgmtStagingUrl>
+        <distMgmtSnapshotsId>transwarp-snapshots</distMgmtSnapshotsId>
+        <distMgmtSnapshotsName>public-libs-snapshot-local</distMgmtSnapshotsName>
+        <distMgmtSnapshotsUrl>http://172.16.1.168:8081/artifactory/libs-snapshot-local</distMgmtSnapshotsUrl>
+
+        <docker.user>jenkins</docker.user>
+        <docker.imageName>gn-tdc-server</docker.imageName>
+        <skipDockerBuild>false</skipDockerBuild>
+    </properties>
+
+    <repositories>
+        <repository>
+            <id>${distMgmtStagingId}</id>
+            <!-- This should be at top, it makes maven try the central repo first and then others and hence faster dep resolution -->
+            <name>${distMgmtStagingName}</name>
+            <url>${distMgmtStagingUrl}</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+    <distributionManagement>
+        <snapshotRepository>
+            <id>${distMgmtSnapshotsId}</id>
+            <name>${distMgmtSnapshotsName}</name>
+            <url>${distMgmtSnapshotsUrl}</url>
+        </snapshotRepository>
+        <repository>
+            <id>${distMgmtStagingId}</id>
+            <name>${distMgmtStagingName}</name>
+            <url>${distMgmtStagingUrl}</url>
+        </repository>
+    </distributionManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.5.1</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+
+            <!-- jacoco plugin -->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.7.1.201405082137</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+    </build>
 
 </project>

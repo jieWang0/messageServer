@@ -1,0 +1,5 @@
+[[template]]
+src = "application.yml.tmpl"
+dest = "/etc/gn/conf/application.yml"
+mode = "0664"
+check_cmd = "/bin/true"
