@@ -43,5 +43,5 @@ ADD gn-tdc-server/target/gn-tdc-server-1.0-SNAPSHOT.jar $GN_LIB_DIR/ng-tdc-serve
 
 RUN mv $GN_BIN_DIR/boot.sh /bin/
 
-#ENTRYPOINT ["/bin/boot.sh"]
-ENTRYPOINT ["java","-jar","/var/lib/gn/lib/ng-tdc-server.jar"]
+ENTRYPOINT ["/bin/boot.sh"]
+#ENTRYPOINT ["java","-jar","/var/lib/gn/lib/ng-tdc-server.jar"]
