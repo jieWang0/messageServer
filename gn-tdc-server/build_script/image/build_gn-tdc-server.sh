@@ -38,7 +38,7 @@ mvn clean package \
 -DdistMgmtSnapshotsUrl=${snapRepoUrl}
 
 #生成docker镜像
-docker build . -t jenkins/gn-tdc-server:latest
+docker build ./gn-tdc-server -t jenkins/gn-tdc-server:latest
 
 docker tag jenkins/gn-tdc-server:latest ${DOCKER_REPO_URL}/${BUILDER}/gn-tdc-server:${IMAGE_TAG}
 docker push ${DOCKER_REPO_URL}/${BUILDER}/gn-tdc-server:${IMAGE_TAG}

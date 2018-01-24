@@ -10,26 +10,26 @@ ls /usr/java/jdk1.8* && \
 # use TCP for DNS
 echo "options use-vc" >>/etc/resolv.conf
 
-export TCC_CONFD_DIR=${TCC_CONFD_DIR:-/var/lib/tcc/confd}
-export TCC_SERVER_PORT=${TCC_SERVER_PORT:-9042}
-export CAS_JKS_PATH=${CAS_JKS_PATH:-/var/lib/tcc/lib/trusted.jks}
+export GN_TDC_CONFD_DIR=${GN_TDC_CONFD_DIR:-/var/lib/gn/confd}
+export GN_TDC_SERVER_PORT=${GN_TDC_SERVER_PORT:-9042}
+export CAS_JKS_PATH=${CAS_JKS_PATH:-/var/lib/gn/lib/trusted.jks}
 export CAS_PASSWD=${CAS_PASSWD:-Transwarp01!}
-export TCC_TXSQL_SERVER=${TCC_TXSQL_SERVER:-localhost}
-export TCC_TXSQL_USERNAME=${TCC_TXSQL_USERNAME:-}
-export TCC_TXSQL_PASSWORD=${TCC_TXSQL_PASSWORD:-}
-export TCC_TXSQL_PORT=${TCC_TXSQL_PORT:-3306}
-export TCC_TXSQL_DB=${TCC_TXSQL_DB:-tcc}
+export GN_TDC_TXSQL_SERVER=${GN_TDC_TXSQL_SERVER:-localhost}
+export GN_TDC_TXSQL_USERNAME=${GN_TDC_TXSQL_USERNAME:-}
+export GN_TDC_TXSQL_PASSWORD=${GN_TDC_TXSQL_PASSWORD:-}
+export GN_TDC_TXSQL_PORT=${GN_TDC_TXSQL_PORT:-3306}
+export GN_TDC_TXSQL_DB=${GN_TDC_TXSQL_DB:-gn}
 
 # render the configuration
-confd -onetime -confdir ${TCC_CONFD_DIR} -backend env
+confd -onetime -confdir ${GN_TDC_CONFD_DIR} -backend env
 
 mysql \
---host="$TCC_TXSQL_SERVER" \
---port="$TCC_TXSQL_PORT" \
---user="$TCC_TXSQL_USERNAME" \
---password="$TCC_TXSQL_PASSWORD" \
+--host="$GN_TDC_TXSQL_SERVER" \
+--port="$GN_TDC_TXSQL_PORT" \
+--user="$GN_TDC_TXSQL_USERNAME" \
+--password="$GN_TDC_TXSQL_PASSWORD" \
 << EOF
-CREATE DATABASE IF NOT EXISTS ${TCC_TXSQL_DB} CHARACTER SET utf8;
+CREATE DATABASE IF NOT EXISTS ${GN_TDC_TXSQL_DB} CHARACTER SET utf8;
 EOF
 
 # check customized args
@@ -46,12 +46,11 @@ fi
 
 # we need to specify the proxy prefix for cas and app,
 # if there is no proxy, use real ip instead
-# ${javaExec} -cp . -Dloader.path=/etc/conf/tcc/ \
 ${javaExec} -cp . \
 ${JAVA_D_ARGS} \
 ${JAVA_VM_ARGS} \
 -Dloader.path=/etc/gn/conf \
--Dserver.port="${TCC_SERVER_PORT}" \
+-Dserver.port="${GN_TDC_SERVER_PORT}" \
 -Djavax.net.ssl.trustStore="${CAS_JKS_PATH}" \
 -Djavax.net.ssl.trustStorePassword="${CAS_PASSWD}" \
--jar /var/lib/tcc/lib/ng-tdc-server.jar
+-jar /var/lib/gn/lib/gn-tdc-server.jar
