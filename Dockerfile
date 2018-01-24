@@ -33,10 +33,10 @@ RUN mkdir -p $GN_CONF_DIR && \
 # commented by wzy. cause no proxy need in image
 
 # add confd+configuration
-ADD gn-tdc-server/docker-build $GN_CONFD_DIR
+ADD gn-tdc-server/docker-build/confd $GN_CONFD_DIR
 
 # add boot scripts
-ADD gn-tdc-server/docker-build $GN_BIN_DIR
+ADD gn-tdc-server/docker-build/bin $GN_BIN_DIR
 
 # final step is to add application jar file
 ADD gn-tdc-server/target/gn-tdc-server-1.0-SNAPSHOT.jar $GN_LIB_DIR/ng-tdc-server.jar
