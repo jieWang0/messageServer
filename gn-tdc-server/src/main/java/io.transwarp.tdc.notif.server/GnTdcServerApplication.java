@@ -8,10 +8,10 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @EnableScheduling
 @MapperScan("io.transwarp.tdc.notif.server.kafkanotification.mapper")
-public class GnTdcServerTestApplication {
+public class GnTdcServerApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(GnTdcServerTestApplication.class, args);
+        SpringApplication.run(GnTdcServerApplication.class, args);
     }
 
 }

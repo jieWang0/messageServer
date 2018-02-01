@@ -40,7 +40,7 @@ public class NgProducerService implements INgProducerService {
         @Override
         public void onCompletion(RecordMetadata recordMetadata, Exception e) {
             if(e!=null) {
-                logger.error("MyProducer.produce:failed to produce message",e);
+                logger.error("NgProducerService.produce:failed to produce message",e);
             }
         }
     }
