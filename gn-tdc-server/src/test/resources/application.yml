@@ -1,0 +1,10 @@
+#kafka configuration:
+kafka:
+  consumer:
+    bootstrapServers : 127.0.0.1:9092
+    group : testKafka
+    enableAutoCommit: false
+    topic: myKafkaTopic
+  producer:
+    bootstrapServers: 127.0.0.1:9092
+    topic: mykafkaTopic
