@@ -1,12 +1,9 @@
 package io.transwarp.tdc.gn.client.consume;
 
 import io.transwarp.tdc.gn.common.NotificationConsumerRecords;
-import io.transwarp.tdc.gn.common.OffsetAndMetadata;
-import io.transwarp.tdc.gn.common.TopicPartition;
+import io.transwarp.tdc.gn.common.PartitionOffset;
 
 import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Notif message consumer
@@ -22,29 +19,7 @@ public interface Consumer<T> {
      */
     String group();
 
-    /**
-     * get the assignments
-     * @return
-     */
-    Set<TopicPartition> assignments();
-
-    /**
-     * get the current subscribed topic list
-     * @return topic list
-     */
-    Set<String> subscriptions();
-
-    /**
-     * subscribe given list of topics,
-     * empty list means 'unsubscribe'
-     * @param topics list of topics which should not be null
-     */
-    void subscribe(Collection<String> topics);
-
-    /**
-     * cancel all subscriptions
-     */
-    void unsubscribe();
+    String topic();
 
     /**
      * fetch data within timeout
@@ -54,21 +29,10 @@ public interface Consumer<T> {
     NotificationConsumerRecords<T> poll(long timeoutMillis);
 
     /**
-     * commit all of polled records as consumed.
+     * commit given offset
+     * @param partitionOffsets
      */
-    void commit();
-
-    /**
-     * commit given offsets
-     * @param offsets
-     */
-    void commit(Map<TopicPartition, OffsetAndMetadata> offsets);
-
-//    void seek(TopicPartition partition, long offset);
-//
-//    void seekToBeginning(Collection<TopicPartition> partitions);
-//
-//    void seekToEnd(Collection<TopicPartition> partitions);
+    void commit(Collection<PartitionOffset> partitionOffsets);
 
     /**
      * close the consumer

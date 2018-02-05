@@ -25,13 +25,7 @@
 
     <properties>
         <java.version>1.8</java.version>
-        <shiro.version>1.3.2</shiro.version>
-        <guardian.version>2.0-transwarp-5.1.0</guardian.version>
-        <simmail.version>0.0.1-SNAPSHOT</simmail.version>
-        <ticket.version>0.0.1-SNAPSHOT</ticket.version>
         <spring.kafka.version>1.2.2.RELEASE</spring.kafka.version>
-        <notification.version>1.0-transwarp-5.1.0-SNAPSHOT</notification.version>
-        <prometheus.version>0.1.0</prometheus.version>
 
         <distMgmtStagingId>transwarp-release</distMgmtStagingId>
         <distMgmtStagingName>public-libs-release-local</distMgmtStagingName>
@@ -72,17 +66,36 @@
         </repository>
     </distributionManagement>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>2.8.7</version>
+            </dependency>
+
+            <!-- transwarp web common library http://172.16.1.41:10080/TDC/mangix.git -->
+            <dependency>
+                <groupId>io.transwarp</groupId>
+                <artifactId>mangix-web-common</artifactId>
+                <version>1.0-SNAPSHOT</version>
+            </dependency>
+
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>5.1.36</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <plugins>
@@ -96,22 +109,17 @@
                 </configuration>
             </plugin>
 
-            <!-- jacoco plugin -->
+            <!-- upload source code while deploy the jar -->
             <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.7.1.201405082137</version>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.1.2</version>
                 <executions>
                     <execution>
+                        <id>attach-sources</id>
+                        <phase>verify</phase>
                         <goals>
-                            <goal>prepare-agent</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>report</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>report</goal>
+                            <goal>jar-no-fork</goal>
                         </goals>
                     </execution>
                 </executions>

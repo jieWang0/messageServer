@@ -1,0 +1,6 @@
+server:
+  port: 23333
+
+gn:
+  service:
+    impl: kafka
