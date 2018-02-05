@@ -24,7 +24,6 @@ public class ExceptionAdvise {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public TResult handleGNException(GNException e) {
         LOGGER.error("GNException:", e);
-
         return TResult.fail(e.getMessage());
     }
 }

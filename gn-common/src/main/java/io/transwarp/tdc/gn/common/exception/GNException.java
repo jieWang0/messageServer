@@ -10,7 +10,7 @@ public class GNException extends RuntimeException {
     private ErrorCode errorCode;
 
     public GNException(ErrorCode errorCode) {
-        this(errorCode, null);
+        this(errorCode, (String) null);
     }
 
     public GNException(ErrorCode errorCode, String message) {
@@ -20,6 +20,11 @@ public class GNException extends RuntimeException {
 
     public GNException(ErrorCode errorCode, String message, Throwable cause) {
         super(ErrorFormatter.format(errorCode, message), cause);
+        this.errorCode = errorCode;
+    }
+
+    public GNException(ErrorCode errorCode, Throwable cause) {
+        super(ErrorFormatter.format(errorCode, null), cause);
         this.errorCode = errorCode;
     }
 
