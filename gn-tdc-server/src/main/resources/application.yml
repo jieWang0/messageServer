@@ -4,3 +4,7 @@ server:
 gn:
   service:
     impl: kafka
+
+spring:
+  profiles:
+    include: persistence
