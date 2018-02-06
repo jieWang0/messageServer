@@ -9,7 +9,7 @@ public interface NotificationService {
      * provide the information of connection for client
      * @return
      */
-    ConnectionInfo getConnectionInfo();
+    MetaInfo getMetaInfo();
 
     /**
      * send producer record to MQ/DB
@@ -21,10 +21,4 @@ public interface NotificationService {
      * close the service
      */
     void close();
-
-    /**
-     * inject serializer
-     * @param serializer
-     */
-    void setSerializer(PayloadSerializer serializer);
 }

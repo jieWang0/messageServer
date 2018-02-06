@@ -1,5 +1,5 @@
 package io.transwarp.tdc.gn.common;
 
-public interface PayloadSerializer {
-    String serialize(Object payload);
+public interface PayloadSerializer<T> {
+    String serialize(T payload);
 }

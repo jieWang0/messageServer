@@ -1,7 +1,7 @@
 package io.transwarp.tdc.gn.service.db;
 
 import io.transwarp.tdc.gn.common.NotificationConsumerRecords;
-import io.transwarp.tdc.gn.common.OffsetAndMetadata;
+import io.transwarp.tdc.gn.common.PartitionOffset;
 import io.transwarp.tdc.gn.common.TopicPartition;
 import io.transwarp.tdc.gn.service.NotificationService;
 
@@ -56,5 +56,5 @@ public interface DatabaseNotificationService extends NotificationService {
      * @param consumerGroup
      * @param offsets
      */
-    void commit(String consumerGroup, Map<TopicPartition, OffsetAndMetadata> offsets);
+    void commit(String consumerGroup, Map<TopicPartition, PartitionOffset> offsets);
 }
