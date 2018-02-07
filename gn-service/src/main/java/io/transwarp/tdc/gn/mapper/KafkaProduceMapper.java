@@ -1,14 +1,15 @@
-package com.example.kafkatest.kafkanotification.mapper;
+package io.transwarp.tdc.gn.mapper;
 
-import io.transwarp.tdc.notif.server.kafkanotification.entity.NotificationEntity;
+
+import io.transwarp.tdc.gn.model.KafkaProduceEntity;
 
 import java.util.List;
 
-public interface NotificationMapper {
+public interface KafkaProduceMapper {
 
     void saveFailedProduce(String topic, String message);
 
-    List<NotificationEntity> getFailedProduce();
+    List<KafkaProduceEntity> getFailedProduce();
 
     void deleteFailedProduce(Long id);
 }

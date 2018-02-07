@@ -1,4 +1,4 @@
-package com.example.kafkatest.kafkanotification.utils;
+package io.transwarp.tdc.gn.common;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -9,20 +9,20 @@ import java.util.Properties;
 
 @Component
 @Configuration
-@EnableConfigurationProperties(KafkaConfigBean.class)
+@EnableConfigurationProperties(KafkaProducerConfigInfo.class)
 public class KafkaConfigUtils {
 
     @Autowired
-    private KafkaConfigBean kafkaConfigBean;
+    private KafkaProducerConfigInfo kafkaProducerConfigInfo;
 
-    public Properties getKafkaConfig(){
+    public Properties getKafkaProducerConfig(){
         Properties props = new Properties();
-        props.put("bootstrap.servers", kafkaConfigBean.getBootstrapServers());
-        props.put("acks", kafkaConfigBean.getAcks());
-        props.put("retries", kafkaConfigBean.getRetries());
-        props.put("batch.size", kafkaConfigBean.getBatchSize());
-        props.put("key.serializer", kafkaConfigBean.getKeySerializer());
-        props.put("value.serializer", kafkaConfigBean.getValueSerializer());
+        props.put("bootstrap.servers", kafkaProducerConfigInfo.getBootstrapServers());
+        props.put("acks", kafkaProducerConfigInfo.getAcks());
+        props.put("retries", kafkaProducerConfigInfo.getRetries());
+        props.put("batch.size", kafkaProducerConfigInfo.getBatchSize());
+        props.put("key.serializer", kafkaProducerConfigInfo.getKeySerializer());
+        props.put("value.serializer", kafkaProducerConfigInfo.getValueSerializer());
         return props;
     }
 }

@@ -1,5 +1,5 @@
 mybatis:
-  mapper-locations: classpath:mapper/*.xml
+  mapper-locations: classpath:mapper/*.xml,classpath:kafka/config/mapper/*.xml
   type-aliases-package: io.transwarp.tdc.gn.model
   configuration:
     map-underscore-to-camel-case: true

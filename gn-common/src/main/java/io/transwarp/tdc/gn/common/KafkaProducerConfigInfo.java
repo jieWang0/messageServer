@@ -4,10 +4,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConfigurationProperties(prefix = "kafka")
-public class KafkaConfigInfo {
+@ConfigurationProperties(prefix = "kafka.producer")
+public class KafkaProducerConfigInfo {
     private String bootstrapServers;
-    private boolean enableAutoCommit;
     private String acks;
     private int retries;
     private int batchSize;
@@ -62,12 +61,5 @@ public class KafkaConfigInfo {
         this.bootstrapServers = bootstrapServers;
     }
 
-    public boolean isEnableAutoCommit() {
-        return enableAutoCommit;
-    }
-
-    public void setEnableAutoCommit(boolean enableAutoCommit) {
-        this.enableAutoCommit = enableAutoCommit;
-    }
 
 }

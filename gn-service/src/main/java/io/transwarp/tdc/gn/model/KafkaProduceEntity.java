@@ -1,13 +1,13 @@
-package com.example.kafkatest.kafkanotification.entity;
+package io.transwarp.tdc.gn.model;
 
 import java.io.Serializable;
 
-public class NotificationEntity implements Serializable{
+public class KafkaProduceEntity implements Serializable{
     private Long id;
     private String topic;
     private String message;
 
-    public NotificationEntity(Long id,String topoc, String message) {
+    public KafkaProduceEntity(Long id, String topoc, String message) {
         this.id = id;
         this.topic = topoc;
         this.message = message;

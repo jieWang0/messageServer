@@ -1,34 +1,57 @@
-package com.example.kafkatest.kafkanotification.dao.impl;
+package io.transwarp.tdc.gn.repository.impl;
 
-import io.transwarp.tdc.notif.server.kafkanotification.dao.INotificationDao;
-import io.transwarp.tdc.notif.server.kafkanotification.entity.NotificationEntity;
-import io.transwarp.tdc.notif.server.kafkanotification.mapper.NotificationMapper;
+import io.transwarp.tdc.gn.mapper.KafkaProduceMapper;
+import io.transwarp.tdc.gn.model.KafkaProduceEntity;
+import io.transwarp.tdc.gn.repository.IKafkaProduceDao;
+import io.transwarp.tdc.gn.service.kafka.impl.KafkaProducerService;
+import org.apache.kafka.clients.producer.Producer;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Repository("notificationDao'")
-public class NotificationDao implements INotificationDao{
+@Repository
+public class KafkaProduceDao  implements IKafkaProduceDao {
+
+    private static final Logger logger = LoggerFactory.getLogger(KafkaProducerService.class);
 
     @Autowired
-    private NotificationMapper notificationMapper;
+    private KafkaProduceMapper kafkaProduceMapper;
 
     @Override
     public void saveFailedProduce(String topic ,String message) {
-        notificationMapper.saveFailedProduce(topic,message);
+        kafkaProduceMapper.saveFailedProduce(topic,message);
     }
 
     @Override
-    public List<NotificationEntity> getFailedProduce() {
-        List<NotificationEntity> list = new ArrayList<>();
-        list =notificationMapper.getFailedProduce();
+    public List<KafkaProduceEntity> getFailedProduce() {
+        List<KafkaProduceEntity> list = new ArrayList<>();
+        list =kafkaProduceMapper.getFailedProduce();
         return list;
     }
 
     @Override
     public void deleteFailedProduce(Long id) {
-        notificationMapper.deleteFailedProduce(id);
+        kafkaProduceMapper.deleteFailedProduce(id);
+    }
+
+    @Override
+    public void autoRetryProduce(Producer<String,String> producer, Long recordId, ProducerRecord<String, String> record) {
+
+        RecordMetadata recordMetadata = null;
+        try {
+             recordMetadata =producer.send(record).get();
+        } catch (Exception e) {
+            logger.error("KafkaProduceDao.autoRetryProduce:failed to produce message,retrying",e);
+        }
+        if(recordMetadata!=null) {
+            deleteFailedProduce(recordId);
+        }
+
     }
 }

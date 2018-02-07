@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="io.transwarp.tdc.gn.mapper.KafkaProduceMapper" >
+
+    <resultMap id="NotificationMap" type="KafkaProduceEntity">
+        <id property="id" column="id"/>
+        <result property="topic" column="topic"/>
+        <result property="message" column="message"/>
+    </resultMap>
+
+    <sql id="Message_List" >
+        id, topic, message
+    </sql>
+
+    <select id="getFailedProduce" resultMap="NotificationMap"  >
+        SELECT
+        <include refid="Message_List" />
+        FROM message_remain
+    </select>
+
+    <insert id="saveFailedProduce" parameterType="KafkaProduceEntity" >
+        INSERT INTO
+        message_remain
+        (topic,message)
+        VALUES
+        (#{0}, #{1})
+    </insert>
+
+
+    <delete id="deleteFailedProduce" parameterType="java.lang.Long" >
+        DELETE FROM
+        message_remain
+        WHERE
+        id =#{id}
+    </delete>
+
+</mapper>
