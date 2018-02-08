@@ -10,3 +10,18 @@ mapper:
 
 pagehelper:
   support-methods-arguments: true
+
+kafka:
+  producer:
+    bootstrapServers: 127.0.0.1:9092
+    acks: all
+    retries: 0
+    batchSize: 16384
+    keySerializer: org.apache.kafka.common.serialization.StringSerializer
+    valueSerializer: org.apache.kafka.common.serialization.StringSerializer
+  consumer:
+    bootstrapServers: 127.0.0.1:9092
+    group: test
+    autoCommit: true
+    keyDeserializer: org.apache.kafka.common.serialization.StringDeserializer
+    valueDeserializer: org.apache.kafka.common.serialization.StringDeserializer

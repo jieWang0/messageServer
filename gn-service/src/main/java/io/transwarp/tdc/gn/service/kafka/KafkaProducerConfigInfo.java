@@ -1,4 +1,4 @@
-package io.transwarp.tdc.gn.common;
+package io.transwarp.tdc.gn.service.kafka;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;

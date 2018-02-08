@@ -14,7 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
  * 18-2-5 created by zado
  */
 @Api(value = "服务基本信息", description = "基本信息相关操作")
-@RestController(ApiConstants.VERSION)
+@RestController
+@RequestMapping(ApiConstants.VERSION)
 public class MetaInfoController {
 
     @ApiOperation(value = "获取基本信息", notes = "返回服务方式、地址等")

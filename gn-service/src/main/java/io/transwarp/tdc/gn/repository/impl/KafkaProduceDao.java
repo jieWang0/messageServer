@@ -24,8 +24,8 @@ public class KafkaProduceDao  implements IKafkaProduceDao {
     private KafkaProduceMapper kafkaProduceMapper;
 
     @Override
-    public void saveFailedProduce(String topic ,String message) {
-        kafkaProduceMapper.saveFailedProduce(topic,message);
+    public void saveFailedProduce(String id,String topic ,String message) {
+        kafkaProduceMapper.saveFailedProduce(id,topic,message);
     }
 
     @Override
@@ -36,12 +36,12 @@ public class KafkaProduceDao  implements IKafkaProduceDao {
     }
 
     @Override
-    public void deleteFailedProduce(Long id) {
+    public void deleteFailedProduce(String id) {
         kafkaProduceMapper.deleteFailedProduce(id);
     }
 
     @Override
-    public void autoRetryProduce(Producer<String,String> producer, Long recordId, ProducerRecord<String, String> record) {
+    public void autoRetryProduce(Producer<String,String> producer, String recordId, ProducerRecord<String, String> record) {
 
         RecordMetadata recordMetadata = null;
         try {

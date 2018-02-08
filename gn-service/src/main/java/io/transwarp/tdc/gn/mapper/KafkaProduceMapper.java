@@ -7,9 +7,9 @@ import java.util.List;
 
 public interface KafkaProduceMapper {
 
-    void saveFailedProduce(String topic, String message);
+    void saveFailedProduce(String id, String topic, String message);
 
     List<KafkaProduceEntity> getFailedProduce();
 
-    void deleteFailedProduce(Long id);
+    void deleteFailedProduce(String id);
 }

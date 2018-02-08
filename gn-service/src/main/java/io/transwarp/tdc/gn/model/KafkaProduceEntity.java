@@ -3,21 +3,21 @@ package io.transwarp.tdc.gn.model;
 import java.io.Serializable;
 
 public class KafkaProduceEntity implements Serializable{
-    private Long id;
+    private String id;
     private String topic;
     private String message;
 
-    public KafkaProduceEntity(Long id, String topoc, String message) {
+    public KafkaProduceEntity(String id, String topoc, String message) {
         this.id = id;
         this.topic = topoc;
         this.message = message;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

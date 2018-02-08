@@ -1,4 +1,4 @@
-package io.transwarp.tdc.gn.common;
+package io.transwarp.tdc.gn.service.kafka;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -15,6 +15,9 @@ public class KafkaConfigUtils {
     @Autowired
     private KafkaProducerConfigInfo kafkaProducerConfigInfo;
 
+    @Autowired
+    private KafkaConsumerConfigInfo kafkaConsumerConfigInfo;
+
     public Properties getKafkaProducerConfig(){
         Properties props = new Properties();
         props.put("bootstrap.servers", kafkaProducerConfigInfo.getBootstrapServers());
@@ -23,6 +26,16 @@ public class KafkaConfigUtils {
         props.put("batch.size", kafkaProducerConfigInfo.getBatchSize());
         props.put("key.serializer", kafkaProducerConfigInfo.getKeySerializer());
         props.put("value.serializer", kafkaProducerConfigInfo.getValueSerializer());
+        return props;
+    }
+
+    public Properties getKafkaConsumerConfig(){
+        Properties props = new Properties();
+        props.put("bootstrap.servers", kafkaConsumerConfigInfo.getBootstrapServers());
+        props.put("enable.auto.commit", kafkaConsumerConfigInfo.isAutoCommit());
+        props.put("group.id", kafkaConsumerConfigInfo.getGroup());
+        props.put("key.deserializer", kafkaConsumerConfigInfo.getKeyDeserializer());
+        props.put("value.deserializer", kafkaConsumerConfigInfo.getValueDeserializer());
         return props;
     }
 }

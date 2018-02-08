@@ -15,7 +15,7 @@ public interface NotificationService {
      * send producer record to MQ/DB
      * @param record
      */
-    <T> void send(NotificationProducerRecord<T> record);
+    <T> void send(NotificationProducerRecord<T> record,boolean ensureSend);
 
     /**
      * close the service

@@ -1,7 +1,7 @@
 package io.transwarp.tdc.gn.service.kafka.impl;
 
-import io.transwarp.tdc.gn.common.KafkaConfigUtils;
-import io.transwarp.tdc.gn.common.KafkaProducerConfigInfo;
+import io.transwarp.tdc.gn.service.kafka.KafkaConfigUtils;
+import io.transwarp.tdc.gn.service.kafka.KafkaProducerConfigInfo;
 import io.transwarp.tdc.gn.model.KafkaProduceEntity;
 import io.transwarp.tdc.gn.repository.impl.KafkaProduceDao;
 import io.transwarp.tdc.gn.service.condition.KafkaImpl;
@@ -38,7 +38,7 @@ public class NgScheduledService {
         Producer<String, String> producer = new KafkaProducer<>(properties);
         List<KafkaProduceEntity> messageList = kafkaProduceDao.getFailedProduce();
         messageList.forEach(entity->{
-            ProducerRecord<String, String> record = new ProducerRecord<>(entity.getTopic(), null, entity.getMessage());
+            ProducerRecord<String, String> record = new ProducerRecord<>(entity.getTopic(), entity.getMessage());
             kafkaProduceDao.autoRetryProduce(producer,entity.getId(),record);
         });
     }

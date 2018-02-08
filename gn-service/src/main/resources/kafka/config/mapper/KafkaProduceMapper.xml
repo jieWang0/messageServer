@@ -21,13 +21,13 @@
     <insert id="saveFailedProduce" parameterType="KafkaProduceEntity" >
         INSERT INTO
         message_remain
-        (topic,message)
+        (id,topic,message)
         VALUES
-        (#{0}, #{1})
+        (#{0},#{1},#{2})
     </insert>
 
 
-    <delete id="deleteFailedProduce" parameterType="java.lang.Long" >
+    <delete id="deleteFailedProduce" parameterType="java.lang.String" >
         DELETE FROM
         message_remain
         WHERE
