@@ -6,11 +6,13 @@ public class KafkaProduceEntity implements Serializable{
     private String id;
     private String topic;
     private String message;
+    private Long createTime;
 
-    public KafkaProduceEntity(String id, String topoc, String message) {
+    public KafkaProduceEntity(String id, String topic, String message,Long createTime) {
         this.id = id;
-        this.topic = topoc;
+        this.topic = topic;
         this.message = message;
+        this.createTime = createTime;
     }
 
     public String getId() {
@@ -35,5 +37,13 @@ public class KafkaProduceEntity implements Serializable{
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public long getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(long createTime) {
+        this.createTime = createTime;
     }
 }

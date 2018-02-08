@@ -29,17 +29,20 @@ public class NgScheduledService {
     @Autowired
     private KafkaConfigUtils kafkaConfigUtils;
 
+    @Autowired
+    private KafkaProducerService kafkaProducerService;
+
     /**
      * desc：将之前produce失败后存储到DB的数据重新produce
      * */
     @Scheduled(cron = "0 0 */1 * * ? ")
     public void retryFailedProduce() {
-        Properties properties = kafkaConfigUtils.getKafkaProducerConfig();
-        Producer<String, String> producer = new KafkaProducer<>(properties);
+
+        Producer<String, String> producer = kafkaConfigUtils.getKafkaProducer();
         List<KafkaProduceEntity> messageList = kafkaProduceDao.getFailedProduce();
         messageList.forEach(entity->{
             ProducerRecord<String, String> record = new ProducerRecord<>(entity.getTopic(), entity.getMessage());
-            kafkaProduceDao.autoRetryProduce(producer,entity.getId(),record);
+            kafkaProducerService.autoRetryProduce(producer,entity.getId(),record);
         });
     }
 }

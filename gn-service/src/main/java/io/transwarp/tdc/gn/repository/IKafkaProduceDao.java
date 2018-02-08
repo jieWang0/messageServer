@@ -7,8 +7,7 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import java.util.List;
 
 public interface IKafkaProduceDao {
-    void saveFailedProduce(String id,String topic, String message);
+    void saveFailedProduce(String id,String topic, String message,Long createTime);
     List<KafkaProduceEntity> getFailedProduce();
     void deleteFailedProduce(String id);
-    void autoRetryProduce(Producer<String,String> producer, String recordId, ProducerRecord<String, String> record);
 }

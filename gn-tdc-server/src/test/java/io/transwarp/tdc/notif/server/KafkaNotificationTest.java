@@ -1,6 +1,5 @@
 package io.transwarp.tdc.notif.server;
 
-import io.transwarp.tdc.gn.service.kafka.KafkaConfigUtils;
 import io.transwarp.tdc.gn.service.kafka.KafkaConsumerConfigInfo;
 import io.transwarp.tdc.gn.service.kafka.KafkaProducerConfigInfo;
 import io.transwarp.tdc.gn.common.exception.GNException;
@@ -37,9 +36,6 @@ public class KafkaNotificationTest {
 
     @Autowired
      KafkaConsumerConfigInfo kafkaConsumerConfigInfo;
-
-    @Autowired
-    KafkaConfigUtils kafkaConfigUtils;
 
     @Autowired
     KafkaProducerService kafkaProducerService;

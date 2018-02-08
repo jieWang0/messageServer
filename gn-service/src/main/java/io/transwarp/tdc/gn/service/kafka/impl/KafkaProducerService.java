@@ -25,7 +25,7 @@ import java.util.Properties;
 public class KafkaProducerService extends KafkaNotificationService {
 
     @Autowired
-    private KafkaProduceDao notificationDao;
+    private KafkaProduceDao kafkaProduceDao;
 
     @Autowired
     KafkaProducerConfigInfo kafkaProducerConfigInfo;
@@ -49,8 +49,7 @@ public class KafkaProducerService extends KafkaNotificationService {
         if(!checkTopic(record.getTopic()))
             throw new GNException(ErrorCode.INVALID_TOPIC_ERROR,"topic不合法");
 
-        Properties properties = kafkaConfigUtils.getKafkaProducerConfig();
-        Producer<String, String> producer = new KafkaProducer<>(properties);
+        Producer<String, String> producer = kafkaConfigUtils.getKafkaProducer();
         ProducerRecord<String, String> producerRecord =
                 new ProducerRecord<>(record.getTopic(),record.getPayload().toString());
         try {
@@ -58,15 +57,28 @@ public class KafkaProducerService extends KafkaNotificationService {
         } catch (Exception e) {
             logger.error("KafkaProducerService.send:failed to send message",e);
             if(ensureSend) {
-                notificationDao.saveFailedProduce(record.getGuid(),record.getTopic(),record.getPayload().toString());
+                kafkaProduceDao.saveFailedProduce(record.getGuid(),record.getTopic(),record.getPayload().toString(),record.getCreateTime());
             }else {
                 throw new GNException(ErrorCode.SEND_ERROR,"KafkaProducerService.send:failed to send message");
             }
-        }finally {
-            producer.close();
         }
+        // producer.close();
+
     }
 
+    public void autoRetryProduce(Producer<String,String> producer, String recordId, ProducerRecord<String, String> record) {
+
+        RecordMetadata recordMetadata = null;
+        try {
+            recordMetadata =producer.send(record).get();
+        } catch (Exception e) {
+            logger.error("KafkaProduceDao.autoRetryProduce:failed to produce message,retrying",e);
+        }
+        if(recordMetadata!=null) {
+            kafkaProduceDao.deleteFailedProduce(recordId);
+        }
+
+    }
     /**
      * desc:判断topic是否合法
      * */

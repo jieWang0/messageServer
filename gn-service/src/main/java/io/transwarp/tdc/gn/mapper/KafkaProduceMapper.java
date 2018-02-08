@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface KafkaProduceMapper {
 
-    void saveFailedProduce(String id, String topic, String message);
+    void saveFailedProduce(String id, String topic, String message,long createTime);
 
     List<KafkaProduceEntity> getFailedProduce();
 

@@ -1,22 +1,28 @@
 package io.transwarp.tdc.gn.service.kafka;
 
+import org.apache.kafka.clients.producer.KafkaProducer;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
 import java.util.Properties;
 
 @Component
-@Configuration
-@EnableConfigurationProperties(KafkaProducerConfigInfo.class)
 public class KafkaConfigUtils {
 
     @Autowired
-    private KafkaProducerConfigInfo kafkaProducerConfigInfo;
+    KafkaProducerConfigInfo kafkaProducerConfigInfo;
 
     @Autowired
-    private KafkaConsumerConfigInfo kafkaConsumerConfigInfo;
+    KafkaConsumerConfigInfo kafkaConsumerConfigInfo;
+
+    private  KafkaProducer<String,String> kafkaProducer ;
+
+    public KafkaProducer<String,String> getKafkaProducer(){
+        if(this.kafkaProducer == null) {
+            this.kafkaProducer = new KafkaProducer<>(getKafkaProducerConfig());
+        }
+        return this.kafkaProducer;
+    }
 
     public Properties getKafkaProducerConfig(){
         Properties props = new Properties();

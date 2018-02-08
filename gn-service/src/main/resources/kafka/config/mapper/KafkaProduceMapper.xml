@@ -6,10 +6,11 @@
         <id property="id" column="id"/>
         <result property="topic" column="topic"/>
         <result property="message" column="message"/>
+        <result property="createTime" column="createTime"/>
     </resultMap>
 
     <sql id="Message_List" >
-        id, topic, message
+        id, topic, message,createTime
     </sql>
 
     <select id="getFailedProduce" resultMap="NotificationMap"  >
@@ -21,9 +22,9 @@
     <insert id="saveFailedProduce" parameterType="KafkaProduceEntity" >
         INSERT INTO
         message_remain
-        (id,topic,message)
+        (id,topic,message,createTime)
         VALUES
-        (#{0},#{1},#{2})
+        (#{0},#{1},#{2},#{3})
     </insert>
 
 
