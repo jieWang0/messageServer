@@ -7,6 +7,6 @@ class ErrorFormatter {
 
     public static String format(ErrorCode error, String message) {
         return "Error[" + error.getCode() + "]" + error.name()
-            + (message != null && message.isEmpty() ? ": " + message : "");
+            + (message != null && !message.isEmpty() ? ": " + message : "");
     }
 }
