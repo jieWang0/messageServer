@@ -34,27 +34,27 @@ public class KafkaProducerRecord<T> implements NotificationProducerRecord {
     }
 
     @Override
-    public String getGuid() {
+    public String guid() {
         return this.guid;
     }
 
     @Override
-    public String getTopic() {
+    public String topic() {
         return this.topic;
     }
 
     @Override
-    public int getPartition() {
+    public int partition() {
         return this.partition;
     }
 
     @Override
-    public long getCreateTime() {
+    public long createTime() {
         return this.createTime;
     }
 
     @Override
-    public Object getPayload() {
+    public Object payload() {
         return this.payload;
     }
 }

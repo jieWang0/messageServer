@@ -19,14 +19,14 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.kafka.test.rule.KafkaEmbedded;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.util.*;
 
-@SpringApplicationConfiguration(classes = GnTdcServerApplication.class)
+@SpringBootTest(classes = GnTdcServerApplication.class)
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
 public class KafkaNotificationTest {
@@ -82,7 +82,7 @@ public class KafkaNotificationTest {
         kafkaProducerConfigInfo.setBootstrapServers("127.0.0.1:0000");
         KafkaProducerRecord<String> record = new KafkaProducerRecord<>(topic,test_message);
         kafkaProducerService.send(record,true);
-        checkDB(record.getGuid());
+        checkDB(record.guid());
     }
 
     public void checkSend() {
