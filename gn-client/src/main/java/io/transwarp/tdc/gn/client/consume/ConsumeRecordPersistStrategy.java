@@ -1,7 +1,7 @@
 package io.transwarp.tdc.gn.client.consume;
 
 import io.transwarp.tdc.gn.common.NotificationConsumerRecord;
-import io.transwarp.tdc.gn.common.PayloadSerializer;
+import io.transwarp.tdc.gn.common.seder.PayloadSerializer;
 
 public interface ConsumeRecordPersistStrategy {
 

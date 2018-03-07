@@ -14,17 +14,12 @@
         <module>gn-common</module>
         <module>gn-tdc-server</module>
         <module>gn-schema</module>
+        <module>gn-spring</module>
     </modules>
-
-    <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>1.3.3.RELEASE</version>
-        <relativePath/>
-    </parent>
 
     <properties>
         <java.version>1.8</java.version>
+        <spring-boot.version>1.5.6.RELEASE</spring-boot.version>
         <spring.kafka.version>1.2.2.RELEASE</spring.kafka.version>
 
         <distMgmtStagingId>transwarp-release</distMgmtStagingId>
@@ -76,18 +71,6 @@
                 <scope>import</scope>
             </dependency>
 
-            <!-- transwarp web common library http://172.16.1.41:10080/TDC/mangix.git -->
-            <dependency>
-                <groupId>io.transwarp</groupId>
-                <artifactId>mangix-web-common</artifactId>
-                <version>1.0-SNAPSHOT</version>
-            </dependency>
-
-            <dependency>
-                <groupId>io.transwarp</groupId>
-                <artifactId>mangix-utils</artifactId>
-                <version>1.0-SNAPSHOT</version>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 

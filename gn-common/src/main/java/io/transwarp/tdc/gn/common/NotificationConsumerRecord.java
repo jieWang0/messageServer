@@ -2,15 +2,17 @@ package io.transwarp.tdc.gn.common;
 
 public interface NotificationConsumerRecord<T> {
 
-    String getGuid();
+    String guid();
 
-    String getTopic();
+    String topic();
 
-    int getPartition();
+    String group();
 
-    long getOffset();
+    int partition();
 
-    long getCreateTime();
+    long offset();
 
-    T getPayload();
+    long createTime();
+
+    T payload();
 }

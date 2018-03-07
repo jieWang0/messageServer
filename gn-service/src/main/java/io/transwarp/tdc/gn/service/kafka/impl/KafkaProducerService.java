@@ -1,13 +1,13 @@
 package io.transwarp.tdc.gn.service.kafka.impl;
 
 import io.transwarp.tdc.gn.common.NotificationStorageType;
+import io.transwarp.tdc.gn.model.MetaInfo;
 import io.transwarp.tdc.gn.service.kafka.KafkaConfigUtils;
 import io.transwarp.tdc.gn.service.kafka.KafkaProducerConfigInfo;
 import io.transwarp.tdc.gn.common.NotificationProducerRecord;
 import io.transwarp.tdc.gn.common.exception.ErrorCode;
 import io.transwarp.tdc.gn.common.exception.GNException;
 import io.transwarp.tdc.gn.repository.impl.KafkaProduceDao;
-import io.transwarp.tdc.gn.service.MetaInfo;
 import io.transwarp.tdc.gn.service.kafka.KafkaNotificationService;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -46,18 +46,18 @@ public class KafkaProducerService extends KafkaNotificationService {
     @Override
     public <T> void send(NotificationProducerRecord<T> record,boolean ensureSend) {
 
-        if(!checkTopic(record.getTopic()))
+        if(!checkTopic(record.topic()))
             throw new GNException(ErrorCode.INVALID_TOPIC_ERROR,"topic不合法");
 
         Producer<String, String> producer = kafkaConfigUtils.getKafkaProducer();
         ProducerRecord<String, String> producerRecord =
-                new ProducerRecord<>(record.getTopic(),record.getPayload().toString());
+                new ProducerRecord<>(record.topic(),record.payload().toString());
         try {
             producer.send(producerRecord).get();
         } catch (Exception e) {
             logger.error("KafkaProducerService.send:failed to send message",e);
             if(ensureSend) {
-                kafkaProduceDao.saveFailedProduce(record.getGuid(),record.getTopic(),record.getPayload().toString(),record.getCreateTime());
+                kafkaProduceDao.saveFailedProduce(record.guid(),record.topic(),record.payload().toString(),record.createTime());
             }else {
                 throw new GNException(ErrorCode.SEND_ERROR,"KafkaProducerService.send:failed to send message");
             }

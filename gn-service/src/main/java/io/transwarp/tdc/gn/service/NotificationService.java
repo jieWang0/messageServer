@@ -1,7 +1,7 @@
 package io.transwarp.tdc.gn.service;
 
 import io.transwarp.tdc.gn.common.NotificationProducerRecord;
-import io.transwarp.tdc.gn.common.PayloadSerializer;
+import io.transwarp.tdc.gn.model.MetaInfo;
 
 public interface NotificationService {
 

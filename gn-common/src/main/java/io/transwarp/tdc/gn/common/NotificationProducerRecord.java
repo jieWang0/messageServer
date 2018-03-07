@@ -2,14 +2,14 @@ package io.transwarp.tdc.gn.common;
 
 public interface NotificationProducerRecord<T> {
 
-    String getGuid();
+    String guid();
 
-    String getTopic();
+    String topic();
 
-    int getPartition();
+    int partition();
 
-    long getCreateTime();
+    long createTime();
 
-    T getPayload();
+    T payload();
 
 }
