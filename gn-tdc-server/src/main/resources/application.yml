@@ -3,8 +3,18 @@ server:
 
 gn:
   service:
-    impl: kafka
+    impl: DATABASE
+  public:
+    url: http://172.16.111.69:23333
 
 spring:
   profiles:
     include: persistence
+  datasource:
+    url: jdbc:mysql://172.16.2.107:3306/tdc_gn?characterEncoding=utf8&useSSL=true&autoReconnect=true
+    username: jz
+    password: jz
+    driver-class-name: com.mysql.jdbc.Driver
+    tomcat:
+      test-on-borrow: true
+      validation-query: SELECT 1

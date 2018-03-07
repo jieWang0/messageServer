@@ -24,15 +24,23 @@
             <version>0.10.2.0</version>
         </dependency>
 
+        <!-- transwarp web common library http://172.16.1.41:10080/TDC/mangix.git -->
         <dependency>
             <groupId>io.transwarp</groupId>
             <artifactId>mangix-web-common</artifactId>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>5.1.36</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.transwarp.tdc</groupId>
+            <artifactId>tdc-distributed-lock</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
