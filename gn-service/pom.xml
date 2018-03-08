@@ -4,12 +4,44 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>gn-parent</artifactId>
-        <groupId>io.transwarp.tdc.notif</groupId>
+        <groupId>io.transwarp.tdc.gn</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>gn-service</artifactId>
 
+    <dependencies>
+        <dependency>
+            <groupId>io.transwarp.tdc.gn</groupId>
+            <artifactId>gn-common</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka-clients</artifactId>
+            <version>0.10.2.0</version>
+        </dependency>
+
+        <!-- transwarp web common library http://172.16.1.41:10080/TDC/mangix.git -->
+        <dependency>
+            <groupId>io.transwarp</groupId>
+            <artifactId>mangix-web-common</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.36</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.transwarp.tdc</groupId>
+            <artifactId>tdc-distributed-lock</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
 
 </project>

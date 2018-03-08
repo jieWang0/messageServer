@@ -1,0 +1,35 @@
+server:
+  port: 23333
+
+gn:
+  service:
+    impl: DATABASE
+  public:
+    url: http://172.16.111.69:23333
+
+spring:
+  profiles:
+    include: persistence
+  datasource:
+    url: jdbc:mysql://172.16.2.107:3306/tdc_gn?characterEncoding=utf8&useSSL=true&autoReconnect=true
+    username: jz
+    password: jz
+    driver-class-name: com.mysql.jdbc.Driver
+    tomcat:
+      test-on-borrow: true
+      validation-query: SELECT 1
+
+kafka:
+  producer:
+    bootstrapServers: 127.0.0.1:9092
+    acks: all
+    retries: 0
+    batchSize: 16384
+    keySerializer: org.apache.kafka.common.serialization.StringSerializer
+    valueSerializer: org.apache.kafka.common.serialization.StringSerializer
+  consumer:
+    bootstrapServers: 127.0.0.1:9092
+    group: test
+    autoCommit: true
+    keyDeserializer: org.apache.kafka.common.serialization.StringDeserializer
+    valueDeserializer: org.apache.kafka.common.serialization.StringDeserializer

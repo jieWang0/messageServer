@@ -4,18 +4,40 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>gn-parent</artifactId>
-        <groupId>io.transwarp.tdc.notif</groupId>
+        <groupId>io.transwarp.tdc.gn</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>gn-client</artifactId>
 
+
     <dependencies>
         <dependency>
-            <groupId>io.transwarp.tdc.notif</groupId>
+            <groupId>io.transwarp.tdc.gn</groupId>
             <artifactId>gn-common</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka-clients</artifactId>
+            <version>0.10.2.0</version>
+        </dependency>
+
+        <!-- transwarp web common library http://172.16.1.41:10080/TDC/mangix.git -->
+        <dependency>
+            <groupId>io.transwarp</groupId>
+            <artifactId>mangix-web-common</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 </project>
