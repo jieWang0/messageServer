@@ -6,6 +6,11 @@ public class PartitionOffset {
 
     private long offset;
 
+    public PartitionOffset(int partition, long offset) {
+        this.partition = partition;
+        this.offset = offset;
+    }
+
     public int getPartition() {
         return partition;
     }
