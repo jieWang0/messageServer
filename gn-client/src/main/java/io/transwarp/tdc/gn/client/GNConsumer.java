@@ -64,12 +64,6 @@ public interface GNConsumer<T>
         Builder consumerArgs(ConsumerArgs consumerArgs);
 
         /**
-         * additional options, optional based on specific implementation
-         * @return
-         */
-        Builder options(Map<String, Object> options);
-
-        /**
          * controls how to persist record
          * @param persistStrategy
          * @return

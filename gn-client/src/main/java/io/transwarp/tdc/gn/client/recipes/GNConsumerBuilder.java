@@ -14,7 +14,6 @@ public class GNConsumerBuilder<T> implements GNConsumer.Builder<T> {
     private ConsumeHandler<T> consumeHandler;
     private ConsumerArgs consumerArgs;
     private SerdeFactory serdeFactory;
-    private Map<String, Object> options;
     private ConsumePersistStrategy<T> persistStrategy;
     private ConsumeDedupeStrategy<T> dedupeStrategy;
     private ConsumeShutdownStrategy shutdownStrategy = new DefaultShutdownStrategy();
@@ -42,12 +41,6 @@ public class GNConsumerBuilder<T> implements GNConsumer.Builder<T> {
     @Override
     public GNConsumer.Builder serdeFactory(SerdeFactory serdeFactory) {
         this.serdeFactory = serdeFactory;
-        return this;
-    }
-
-    @Override
-    public GNConsumer.Builder options(Map<String, Object> options) {
-        this.options = options;
         return this;
     }
 
@@ -90,7 +83,7 @@ public class GNConsumerBuilder<T> implements GNConsumer.Builder<T> {
     @Override
     public GNConsumer build() {
         return new DefaultGNConsumer<>(recordType, consumeHandler, consumerArgs, serdeFactory,
-                options, persistStrategy, dedupeStrategy, shutdownStrategy,
+                persistStrategy, dedupeStrategy, shutdownStrategy,
                 heartbeatDaemon, commitPolicy, metaRetriever);
     }
 

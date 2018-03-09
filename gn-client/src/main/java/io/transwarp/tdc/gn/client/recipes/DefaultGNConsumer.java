@@ -3,12 +3,10 @@ package io.transwarp.tdc.gn.client.recipes;
 import io.transwarp.tdc.gn.client.*;
 import io.transwarp.tdc.gn.client.consume.Consumer;
 import io.transwarp.tdc.gn.client.consume.ConsumerArgs;
-import io.transwarp.tdc.gn.client.consume.DefaultConsumerFactory;
 import io.transwarp.tdc.gn.client.db.DBConsumer;
 import io.transwarp.tdc.gn.client.exception.CommitFailedException;
 import io.transwarp.tdc.gn.client.exception.ShutdownException;
 import io.transwarp.tdc.gn.client.meta.MetaInfoRetriever;
-import io.transwarp.tdc.gn.common.BackendType;
 import io.transwarp.tdc.gn.common.MetaInfo;
 import io.transwarp.tdc.gn.common.NotificationConsumerRecord;
 import io.transwarp.tdc.gn.common.PartitionOffset;
@@ -16,7 +14,6 @@ import io.transwarp.tdc.gn.common.config.ConfigConstants;
 import io.transwarp.tdc.gn.common.exception.ErrorCode;
 import io.transwarp.tdc.gn.common.exception.GNException;
 import io.transwarp.tdc.gn.common.seder.SerdeFactory;
-import io.transwarp.tdc.tracing.retrofit.RetrofitArgs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,8 +21,6 @@ import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import static io.transwarp.tdc.gn.client.config.AbstractConsumerConfig.POLL_TIMEOUT_MILLIS;
 
 /**
  * Default implementation
@@ -39,14 +34,12 @@ public class DefaultGNConsumer<T> implements GNConsumer<T> {
     private final ConsumeHandler<T> consumeHandler;
     private final ConsumerArgs consumerArgs;
     private final SerdeFactory serdeFactory;
-    private final Map<String, Object> options;
     private final ConsumePersistStrategy<T> persistStrategy;
     private final ConsumeDedupeStrategy<T> dedupeStrategy;
     private ConsumeShutdownStrategy shutdownStrategy;
     private ConsumeHeartbeatDaemon heartbeatDaemon;
     private ConsumeCommitPolicy commitPolicy;
     private MetaInfoRetriever metaRetriever;
-    private int pollTimeoutMillis = 5000; // 5 seconds by default
 
     private volatile boolean initialized;
     private Thread consumerThread;
@@ -56,7 +49,7 @@ public class DefaultGNConsumer<T> implements GNConsumer<T> {
 
     DefaultGNConsumer(Class<T> recordType, ConsumeHandler<T> consumeHandler,
                       ConsumerArgs consumerArgs, SerdeFactory serdeFactory,
-                      Map<String, Object> options, ConsumePersistStrategy<T> persistStrategy,
+                      ConsumePersistStrategy<T> persistStrategy,
                       ConsumeDedupeStrategy<T> dedupeStrategy,
                       ConsumeShutdownStrategy shutdownStrategy,
                       ConsumeHeartbeatDaemon heartbeatDaemon,
@@ -66,17 +59,12 @@ public class DefaultGNConsumer<T> implements GNConsumer<T> {
         this.consumeHandler = Objects.requireNonNull(consumeHandler, "ConsumeHandler cannot be null");
         this.consumerArgs = Objects.requireNonNull(consumerArgs, "ConsumerArgs cannot be null");
         this.serdeFactory = serdeFactory;
-        this.options = options;
         this.persistStrategy = persistStrategy;
         this.dedupeStrategy = dedupeStrategy;
         this.shutdownStrategy = Objects.requireNonNull(shutdownStrategy, "Shutdown strategy cannot be null");
         this.heartbeatDaemon = Objects.requireNonNull(heartbeatDaemon, "Heartbeat daemon cannot be null");
         this.commitPolicy = Objects.requireNonNull(commitPolicy, "Commit policy cannot be null");
         this.metaRetriever = Objects.requireNonNull(metaRetriever, "MetaInfoRetriever cannot be null");
-        Integer pollTimeoutMillis = (Integer) options.get(POLL_TIMEOUT_MILLIS);
-        if (pollTimeoutMillis != null) {
-            this.pollTimeoutMillis = pollTimeoutMillis;
-        }
     }
 
     @Override
@@ -97,7 +85,6 @@ public class DefaultGNConsumer<T> implements GNConsumer<T> {
         MetaInfo metaInfo = metaRetriever.metaInfo();
         Map<String, Object> configs = new HashMap<>();
         mergeConfigs(consumerArgs, configs);
-
 
         switch (metaInfo.getBackendType()) {
             case KAFKA:
@@ -153,7 +140,7 @@ public class DefaultGNConsumer<T> implements GNConsumer<T> {
     private void loop() {
         try {
             while (!shutdownStrategy.isShutdown()) {
-                List<NotificationConsumerRecord<T>> records = consumer.poll(pollTimeoutMillis);
+                List<NotificationConsumerRecord<T>> records = consumer.poll(consumerArgs.getPollTimeoutMillis());
                 if (shutdownStrategy.isShutdown()) {
                     logger.info("Shutdown command called, quit the processing.");
                     break;
