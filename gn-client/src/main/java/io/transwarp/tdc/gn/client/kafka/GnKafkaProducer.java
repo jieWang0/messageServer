@@ -1,7 +1,6 @@
 package io.transwarp.tdc.gn.client.kafka;
 
 import io.transwarp.tdc.gn.client.config.AbstractProducerConfig;
-import io.transwarp.tdc.gn.client.db.DBConsumerConfig;
 import io.transwarp.tdc.gn.client.produce.Producer;
 import io.transwarp.tdc.gn.client.rest.GNRestClient;
 import io.transwarp.tdc.gn.client.rest.GNRestClientFactory;
@@ -28,7 +27,7 @@ public class GnKafkaProducer<T> implements Producer<T> {
             throw new IllegalArgumentException("GnKafkaProducer server location is not configured");
         }
         GNRestConfig config = new GNRestConfig();
-        config.setLocation((String) configs.get(DBConsumerConfig.SERVER_LOCATION));
+        config.setLocation((String) configs.get(KafkaProducerConfig.SERVER_LOCATION));
         this.client = GNRestClientFactory.create(config);
         this.ensureSuccess = configs.containsKey("ensureSuccess") && (boolean) configs.get("ensureSuccess");
     }

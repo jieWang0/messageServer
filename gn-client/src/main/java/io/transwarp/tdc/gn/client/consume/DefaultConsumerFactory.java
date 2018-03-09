@@ -2,6 +2,8 @@ package io.transwarp.tdc.gn.client.consume;
 
 import io.transwarp.tdc.gn.client.config.GenericConfig;
 import io.transwarp.tdc.gn.client.db.DBConsumer;
+import io.transwarp.tdc.gn.client.kafka.GnKafkaConsumer;
+import io.transwarp.tdc.gn.client.kafka.KafkaConsumerConfig;
 import io.transwarp.tdc.gn.client.rest.GNRestClient;
 import io.transwarp.tdc.gn.client.rest.GNRestClientFactory;
 import io.transwarp.tdc.gn.client.rest.GNRestConfig;
@@ -42,7 +44,7 @@ public class DefaultConsumerFactory<T> implements ConsumerFactory<T> {
                 LOGGER.info("Success to create a DBConsumer");
                 break;
             case KAFKA:
-                // todo
+                consumer = new GnKafkaConsumer<>(configs);
                 break;
             default:
                 LOGGER.warn("Unknown consumer type, cannot create a consumer");
@@ -69,6 +71,7 @@ public class DefaultConsumerFactory<T> implements ConsumerFactory<T> {
             this.type = NotificationStorageType.DATABASE;
         } else if (NotificationStorageType.KAFKA.name().equals(metaInfo.getType())) {
             this.type = NotificationStorageType.KAFKA;
+            this.configs.put(KafkaConsumerConfig.SERVER_LOCATION,metaInfo.getUrl());
         } else {
             throw new IllegalStateException("Unknown generic notification type: " + metaInfo.getType());
         }

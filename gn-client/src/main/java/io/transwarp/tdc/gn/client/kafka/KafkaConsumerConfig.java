@@ -13,5 +13,7 @@ public class KafkaConsumerConfig extends AbstractConsumerConfig{
     public static final String MAX_POLL_RECORDS = PREFIX + "max.poll.records";
 
     //consumer key的序列化器，暂时用不到key，默认为String
-    public static final String KEY_PAYLOAD_DESERIALIZER = "org.apache.io.transwarp.tdc.gn.client.kafka.common.serialization.StringDeserializer";
+    public static final String KEY_PAYLOAD_DESERIALIZER = "org.apache.kafka.common.serialization.StringDeserializer";
+
+    public static final String VALUE_PAYLOAD_DESERIALIZER = "org.apache.kafka.common.serialization.StringDeserializer";
 }
