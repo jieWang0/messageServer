@@ -1,6 +1,6 @@
 package io.transwarp.tdc.gn.common;
 
-public enum NotificationStorageType {
+public enum BackendType {
     DATABASE,
     KAFKA
 }
