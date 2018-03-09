@@ -39,6 +39,7 @@ public interface Consumer<T> {
 
     /**
      * close the consumer
+     * may throw Shutdown
      */
     void close();
 

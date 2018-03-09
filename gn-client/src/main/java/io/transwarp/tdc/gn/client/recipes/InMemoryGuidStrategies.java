@@ -13,18 +13,32 @@ import java.util.Map;
  * only run on single thread
  * @param <T>
  */
-public class InMemoryGuidStrategy<T>
-        implements ConsumeDedupeStrategy<T>,
-        ConsumePersistStrategy<T>,
-        ConsumeQueryStrategy<T> {
-    private Map<String, NotificationConsumerRecord<T>> records;
+public class InMemoryGuidStrategies<T> {
+    private Map<String, NotificationConsumerRecord<T>> records = new HashMap<>();
 
-    public InMemoryGuidStrategy() {
-        this.records = new HashMap<>();
+    public ConsumePersistStrategy<T> persistStrategy() {
+        return new ConsumePersistStrategy<T>() {
+            @Override
+            public void persist(NotificationConsumerRecord<T> record) {
+                InMemoryGuidStrategies.this.persist(record);
+            }
+
+            @Override
+            public void close() {
+                InMemoryGuidStrategies.this.close();
+            }
+        };
     }
 
-    @Override
-    public boolean isDuplicated(NotificationConsumerRecord<T> record) {
+    public ConsumeDedupeStrategy<T> dedupeStrategy() {
+        return this::isDuplicated;
+    }
+
+    public ConsumeQueryStrategy<T> queryStrategy() {
+        return this::query;
+    }
+
+    private boolean isDuplicated(NotificationConsumerRecord<T> record) {
         if (record.guid() == null) {
             // guid not implemented, then dedupe can not be performed
             throw new IllegalArgumentException("Record.guid() is null");
@@ -32,21 +46,18 @@ public class InMemoryGuidStrategy<T>
         return records.containsKey(record.guid());
     }
 
-    @Override
-    public void persist(NotificationConsumerRecord<T> record) {
+    private void persist(NotificationConsumerRecord<T> record) {
         if (record.guid() == null) {
             throw new IllegalArgumentException("Record.guid() is null");
         }
         records.put(record.guid(), record);
     }
 
-    @Override
-    public NotificationConsumerRecord<T> query(String guid) {
+    private NotificationConsumerRecord<T> query(String guid) {
         return records.get(guid);
     }
 
-    @Override
-    public void close() {
+    private void close() {
         records.clear();
     }
 }

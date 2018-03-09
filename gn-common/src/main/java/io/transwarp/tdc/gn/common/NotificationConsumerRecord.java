@@ -10,15 +10,39 @@ public interface NotificationConsumerRecord<T> {
      */
     String guid();
 
+    /**
+     * the topic that this record belongs
+     * @return
+     */
     String topic();
 
+    /**
+     * the group which is currently consuming
+     * @return
+     */
     String group();
 
+    /**
+     * partition that this record belongs, only meaningful for Kafka
+     * @return
+     */
     int partition();
 
+    /**
+     * the offset of this record
+     * @return
+     */
     long offset();
 
+    /**
+     * the create time of this record
+     * @return
+     */
     long createTime();
 
+    /**
+     * the actual payload
+     * @return
+     */
     T payload();
 }

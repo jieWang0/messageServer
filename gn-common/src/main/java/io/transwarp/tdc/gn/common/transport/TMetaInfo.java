@@ -4,6 +4,9 @@ package io.transwarp.tdc.gn.common.transport;
  * 18-2-5 created by zado
  *
  * 服务和客户端通信使用的数据格式
+ *
+ * need to add more server options that may affect consumer side
+ *
  */
 public class TMetaInfo {
 

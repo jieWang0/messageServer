@@ -24,7 +24,7 @@ public class DBConsumerRecord<T> implements NotificationConsumerRecord<T> {
 
     @Override
     public String guid() {
-        return topic + ":" + group + ":" + offset;
+        return topic + ":" + offset;
     }
 
     @Override

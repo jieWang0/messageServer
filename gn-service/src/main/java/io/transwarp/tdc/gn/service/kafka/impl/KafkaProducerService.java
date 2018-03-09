@@ -1,6 +1,6 @@
 package io.transwarp.tdc.gn.service.kafka.impl;
 
-import io.transwarp.tdc.gn.common.NotificationStorageType;
+import io.transwarp.tdc.gn.common.BackendType;
 import io.transwarp.tdc.gn.model.MetaInfo;
 import io.transwarp.tdc.gn.service.kafka.KafkaConfigUtils;
 import io.transwarp.tdc.gn.service.kafka.KafkaProducerConfigInfo;
@@ -38,7 +38,7 @@ public class KafkaProducerService extends KafkaNotificationService {
     @Override
     public MetaInfo getMetaInfo() {
         MetaInfo metaInfo =  new MetaInfo();
-        metaInfo.setType(NotificationStorageType.KAFKA.toString());
+        metaInfo.setType(BackendType.KAFKA.toString());
         metaInfo.setUrl(kafkaProducerConfigInfo.getBootstrapServers());
         return metaInfo;
     }

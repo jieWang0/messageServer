@@ -1,24 +1,29 @@
 package io.transwarp.tdc.gn.client.recipes;
 
-import io.transwarp.tdc.gn.client.ConsumeDedupeStrategy;
-import io.transwarp.tdc.gn.client.ConsumeHandler;
-import io.transwarp.tdc.gn.client.ConsumePersistStrategy;
-import io.transwarp.tdc.gn.client.GNConsumer;
+import io.transwarp.tdc.gn.client.*;
 import io.transwarp.tdc.gn.client.consume.Consumer;
+import io.transwarp.tdc.gn.client.consume.ConsumerArgs;
 import io.transwarp.tdc.gn.client.consume.DefaultConsumerFactory;
+import io.transwarp.tdc.gn.client.db.DBConsumer;
 import io.transwarp.tdc.gn.client.exception.CommitFailedException;
+import io.transwarp.tdc.gn.client.exception.ShutdownException;
+import io.transwarp.tdc.gn.client.meta.MetaInfoRetriever;
+import io.transwarp.tdc.gn.common.BackendType;
+import io.transwarp.tdc.gn.common.MetaInfo;
 import io.transwarp.tdc.gn.common.NotificationConsumerRecord;
 import io.transwarp.tdc.gn.common.PartitionOffset;
-import io.transwarp.tdc.gn.common.seder.Converter;
+import io.transwarp.tdc.gn.common.config.ConfigConstants;
+import io.transwarp.tdc.gn.common.exception.ErrorCode;
+import io.transwarp.tdc.gn.common.exception.GNException;
+import io.transwarp.tdc.gn.common.seder.SerdeFactory;
+import io.transwarp.tdc.tracing.retrofit.RetrofitArgs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static io.transwarp.tdc.gn.client.config.AbstractConsumerConfig.POLL_TIMEOUT_MILLIS;
 
@@ -27,31 +32,47 @@ import static io.transwarp.tdc.gn.client.config.AbstractConsumerConfig.POLL_TIME
  * @param <T>
  */
 public class DefaultGNConsumer<T> implements GNConsumer<T> {
+    private static final AtomicInteger consumerCounter = new AtomicInteger(0);
     private static final Logger logger = LoggerFactory.getLogger(DefaultGNConsumer.class);
 
     private final Class<T> recordType;
     private final ConsumeHandler<T> consumeHandler;
-    private final Converter.Factory convertFactory;
+    private final ConsumerArgs consumerArgs;
+    private final SerdeFactory serdeFactory;
     private final Map<String, Object> options;
     private final ConsumePersistStrategy<T> persistStrategy;
     private final ConsumeDedupeStrategy<T> dedupeStrategy;
+    private ConsumeShutdownStrategy shutdownStrategy;
+    private ConsumeHeartbeatDaemon heartbeatDaemon;
+    private ConsumeCommitPolicy commitPolicy;
+    private MetaInfoRetriever metaRetriever;
     private int pollTimeoutMillis = 5000; // 5 seconds by default
 
     private volatile boolean initialized;
-    private volatile boolean shutdown;
+    private Thread consumerThread;
     private CountDownLatch shutdownLatch = new CountDownLatch(1);
 
     private Consumer<T> consumer;
 
-    DefaultGNConsumer(Class<T> recordType, ConsumeHandler<T> consumeHandler, Converter.Factory convertFactory,
+    DefaultGNConsumer(Class<T> recordType, ConsumeHandler<T> consumeHandler,
+                      ConsumerArgs consumerArgs, SerdeFactory serdeFactory,
                       Map<String, Object> options, ConsumePersistStrategy<T> persistStrategy,
-                      ConsumeDedupeStrategy<T> dedupeStrategy) {
+                      ConsumeDedupeStrategy<T> dedupeStrategy,
+                      ConsumeShutdownStrategy shutdownStrategy,
+                      ConsumeHeartbeatDaemon heartbeatDaemon,
+                      ConsumeCommitPolicy commitPolicy,
+                      MetaInfoRetriever metaRetriever) {
         this.recordType = recordType;
-        this.consumeHandler = consumeHandler;
-        this.convertFactory = convertFactory;
+        this.consumeHandler = Objects.requireNonNull(consumeHandler, "ConsumeHandler cannot be null");
+        this.consumerArgs = Objects.requireNonNull(consumerArgs, "ConsumerArgs cannot be null");
+        this.serdeFactory = serdeFactory;
         this.options = options;
         this.persistStrategy = persistStrategy;
         this.dedupeStrategy = dedupeStrategy;
+        this.shutdownStrategy = Objects.requireNonNull(shutdownStrategy, "Shutdown strategy cannot be null");
+        this.heartbeatDaemon = Objects.requireNonNull(heartbeatDaemon, "Heartbeat daemon cannot be null");
+        this.commitPolicy = Objects.requireNonNull(commitPolicy, "Commit policy cannot be null");
+        this.metaRetriever = Objects.requireNonNull(metaRetriever, "MetaInfoRetriever cannot be null");
         Integer pollTimeoutMillis = (Integer) options.get(POLL_TIMEOUT_MILLIS);
         if (pollTimeoutMillis != null) {
             this.pollTimeoutMillis = pollTimeoutMillis;
@@ -64,18 +85,47 @@ public class DefaultGNConsumer<T> implements GNConsumer<T> {
             throw new RuntimeException("GNConsumer cannot be started more than once");
         }
         initialized = true;
-        consumer = new DefaultConsumerFactory<T>(options).getInstance();
-        loop();
+        consumer = buildConsumer();
+        consumerThread = new Thread(this::loop);
+        consumerThread.setName("GN-Consumer-" + consumerCounter.incrementAndGet());
+        consumerThread.start();
+        heartbeatDaemon.start();
+    }
+
+    private Consumer<T> buildConsumer() {
+        // get backend type to determine the impl of client
+        MetaInfo metaInfo = metaRetriever.metaInfo();
+        Map<String, Object> configs = new HashMap<>();
+        mergeConfigs(consumerArgs, configs);
+
+
+        switch (metaInfo.getBackendType()) {
+            case KAFKA:
+                configs.put(ConfigConstants.CONSUMER_SERVICE_LOCATION, metaInfo.getServerUrl());
+                // TODO: construct kafka client
+                return null;
+            case DATABASE:
+                configs.put(ConfigConstants.CONSUMER_SERVICE_LOCATION, metaRetriever.metaInfoSource());
+                return new DBConsumer<>(configs);
+            default:
+                throw new GNException(ErrorCode.META_INFO_ERROR, "Unsupported backend type: " + metaInfo.getBackendType());
+        }
+    }
+
+    private void mergeConfigs(ConsumerArgs consumerArgs, Map<String, Object> configs) {
+        configs.put(ConfigConstants.CONSUMER_POLL_TIMEOUT_MILLIS, consumerArgs.getPollTimeoutMillis());
+        configs.put(ConfigConstants.CONSUMER_AUTO_COMMIT_ENABLED, consumerArgs.isAutoCommitEnabled());
+        configs.put(ConfigConstants.CONSUMER_AUTO_COMMIT_INTERVAL_MILLIS, consumerArgs.getAutoCommitIntervalMillis());
     }
 
     @Override
     public void shutdown() {
-        shutdown = true;
+        shutdownStrategy.shutdown();
     }
 
     @Override
     public void shutdownAwait(long timeoutMillis) throws InterruptedException {
-        shutdown = true;
+        shutdownStrategy.shutdown();
         shutdownLatch.await(timeoutMillis, TimeUnit.MILLISECONDS);
     }
 
@@ -84,20 +134,35 @@ public class DefaultGNConsumer<T> implements GNConsumer<T> {
         return recordType;
     }
 
+    @Override
+    public void setShutdownStrategy(ConsumeShutdownStrategy shutdownStrategy) {
+        if (initialized) {
+            throw new IllegalStateException("Shutdown strategy cannot be changed as the consumer is already started");
+        }
+        this.shutdownStrategy = shutdownStrategy;
+    }
+
+    @Override
+    public void setHeartbeatDaemon(ConsumeHeartbeatDaemon heartbeatDaemon) {
+        if (initialized) {
+            throw new IllegalStateException("heartbeat daemon cannot be changed as the consumer is already started");
+        }
+        this.heartbeatDaemon = heartbeatDaemon;
+    }
+
     private void loop() {
         try {
-            while (!shutdown) {
+            while (!shutdownStrategy.isShutdown()) {
                 List<NotificationConsumerRecord<T>> records = consumer.poll(pollTimeoutMillis);
-                if (shutdown) {
-                    if (records != null && !records.isEmpty()) {
-                        logger.warn("Record polled but consumer is already shut down.");
-                    }
+                if (shutdownStrategy.isShutdown()) {
+                    logger.info("Shutdown command called, quit the processing.");
                     break;
                 }
 
                 if (records == null || records.isEmpty()) {
                     continue;
                 }
+
                 PartitionOffsetRecorder recorder = new PartitionOffsetRecorder();
                 for (NotificationConsumerRecord<T> record: records) {
                     if (dedupeStrategy != null && dedupeStrategy.isDuplicated(record)) {
@@ -120,9 +185,12 @@ public class DefaultGNConsumer<T> implements GNConsumer<T> {
                         persistStrategy.persist(record);
                     }
                     recorder.inc(record.partition(), record.offset());
+                    if (commitPolicy == ConsumeCommitPolicy.Single) {
+                        consumer.commit(Collections.singleton(new PartitionOffset(record.partition(), record.offset())));
+                    }
                 }
                 Collection<PartitionOffset> offsets = recorder.get();
-                if (offsets != null && !offsets.isEmpty()) {
+                if (offsets != null && !offsets.isEmpty() && commitPolicy == ConsumeCommitPolicy.Batch) {
                     try {
                         consumer.commit(offsets);
                     } catch (CommitFailedException cfe) {
@@ -130,6 +198,8 @@ public class DefaultGNConsumer<T> implements GNConsumer<T> {
                     }
                 }
             }
+        } catch (ShutdownException se) {
+            /* a exception-based shutdown action, can be ignored safely */
         } finally {
             try {
                 if (dedupeStrategy != null) {
