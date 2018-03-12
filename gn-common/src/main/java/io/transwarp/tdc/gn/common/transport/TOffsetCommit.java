@@ -5,26 +5,16 @@ package io.transwarp.tdc.gn.common.transport;
  */
 public class TOffsetCommit {
 
-    private String subscriber;
-
-    private String topic;
+    private String user;
 
     private long offset;
 
-    public String getSubscriber() {
-        return subscriber;
+    public String getUser() {
+        return user;
     }
 
-    public void setSubscriber(String subscriber) {
-        this.subscriber = subscriber;
-    }
-
-    public String getTopic() {
-        return topic;
-    }
-
-    public void setTopic(String topic) {
-        this.topic = topic;
+    public void setUser(String user) {
+        this.user = user;
     }
 
     public long getOffset() {

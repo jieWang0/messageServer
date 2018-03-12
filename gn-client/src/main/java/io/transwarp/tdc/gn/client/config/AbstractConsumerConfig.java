@@ -8,6 +8,4 @@ public class AbstractConsumerConfig {
     protected static final String PREFIX = "consumer.";
 
     public static final String PAYLOAD_DESERIALIZER = PREFIX + "deserializer";
-
-    public static final String POLL_TIMEOUT_MILLIS = PREFIX + "poll.timeout.millis";
 }

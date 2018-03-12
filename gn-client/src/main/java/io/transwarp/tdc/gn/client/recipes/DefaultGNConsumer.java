@@ -9,6 +9,7 @@ import io.transwarp.tdc.gn.client.exception.ShutdownException;
 import io.transwarp.tdc.gn.client.meta.MetaInfoRetriever;
 import io.transwarp.tdc.gn.common.MetaInfo;
 import io.transwarp.tdc.gn.common.NotificationConsumerRecord;
+import io.transwarp.tdc.gn.common.NotificationConsumerRecords;
 import io.transwarp.tdc.gn.common.PartitionOffset;
 import io.transwarp.tdc.gn.common.config.ConfigConstants;
 import io.transwarp.tdc.gn.common.exception.ErrorCode;
@@ -93,7 +94,7 @@ public class DefaultGNConsumer<T> implements GNConsumer<T> {
                 return null;
             case DATABASE:
                 configs.put(ConfigConstants.CONSUMER_SERVICE_LOCATION, metaRetriever.metaInfoSource());
-                return new DBConsumer<>(configs);
+                return new DBConsumer<>(consumerArgs);
             default:
                 throw new GNException(ErrorCode.META_INFO_ERROR, "Unsupported backend type: " + metaInfo.getBackendType());
         }
@@ -140,14 +141,10 @@ public class DefaultGNConsumer<T> implements GNConsumer<T> {
     private void loop() {
         try {
             while (!shutdownStrategy.isShutdown()) {
-                List<NotificationConsumerRecord<T>> records = consumer.poll(consumerArgs.getPollTimeoutMillis());
+                NotificationConsumerRecords<T> records = consumer.poll(consumerArgs.getPollTimeoutMillis());
                 if (shutdownStrategy.isShutdown()) {
                     logger.info("Shutdown command called, quit the processing.");
                     break;
-                }
-
-                if (records == null || records.isEmpty()) {
-                    continue;
                 }
 
                 PartitionOffsetRecorder recorder = new PartitionOffsetRecorder();
@@ -177,7 +174,7 @@ public class DefaultGNConsumer<T> implements GNConsumer<T> {
                     }
                 }
                 Collection<PartitionOffset> offsets = recorder.get();
-                if (offsets != null && !offsets.isEmpty() && commitPolicy == ConsumeCommitPolicy.Batch) {
+                if (!offsets.isEmpty() && commitPolicy == ConsumeCommitPolicy.Batch) {
                     try {
                         consumer.commit(offsets);
                     } catch (CommitFailedException cfe) {

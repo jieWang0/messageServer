@@ -1,6 +1,7 @@
 package io.transwarp.tdc.gn.client.consume;
 
 import io.transwarp.tdc.gn.common.NotificationConsumerRecord;
+import io.transwarp.tdc.gn.common.NotificationConsumerRecords;
 import io.transwarp.tdc.gn.common.PartitionOffset;
 
 import java.util.Collection;
@@ -22,14 +23,14 @@ public interface Consumer<T> {
 
     String topic();
 
-    NotificationConsumerRecord<T> pollOnce(long timeoutMillis);
+//    NotificationConsumerRecord<T> pollOnce(long timeoutMillis);
 
     /**
      * fetch data within timeout
      * @param timeoutMillis the timeout
      * @return the iterable records to consume
      */
-    List<NotificationConsumerRecord<T>> poll(long timeoutMillis);
+    NotificationConsumerRecords<T> poll(long timeoutMillis);
 
     /**
      * commit given offset
