@@ -2,7 +2,7 @@ package io.transwarp.tdc.gn.service.db;
 
 import io.transwarp.tdc.gn.common.NotificationConsumerRecords;
 import io.transwarp.tdc.gn.common.PartitionOffset;
-import io.transwarp.tdc.gn.common.GnTopicPartition;
+import io.transwarp.tdc.gn.common.TopicPartition;
 import io.transwarp.tdc.gn.service.NotificationService;
 
 import java.util.List;
@@ -27,7 +27,7 @@ public interface DatabaseNotificationService extends NotificationService {
      * @param consumerGroup
      * @return
      */
-    Set<GnTopicPartition> assignments(String consumerGroup);
+    Set<TopicPartition> assignments(String consumerGroup);
 
     /**
      * get scriscriptions by consumer group
@@ -56,5 +56,5 @@ public interface DatabaseNotificationService extends NotificationService {
      * @param consumerGroup
      * @param offsets
      */
-    void commit(String consumerGroup, Map<GnTopicPartition, PartitionOffset> offsets);
+    void commit(String consumerGroup, Map<TopicPartition, PartitionOffset> offsets);
 }
