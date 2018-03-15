@@ -22,38 +22,8 @@ import java.util.List;
  */
 @Api(value = "消息订阅", description = "订阅/取消订阅消息主题")
 @RestController
-@RequestMapping(ApiConstants.VERSION + "/subscriptions")
+@RequestMapping(ApiConstants.VERSION)
 public class SubscriptionController {
 
-    @Resource
-    private SubscriptionService subscriptionService;
 
-    @ApiOperation(value = "订阅一个主题", notes = "主题必须存在")
-    @RequestMapping(value = "/subscribe", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public TResult subscribe(
-            @RequestParam(value = "subscriber") String subscriber,
-            @RequestParam(value = "topic") String topic) {
-
-        subscriptionService.subscribe(subscriber, topic);
-        return TResult.success("Success to subscribe topic");
-    }
-
-    @ApiOperation(value = "取消订阅一个主题")
-    @RequestMapping(value = "/unsubscribe", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public TResult unsubscribe(
-            @RequestParam(value = "subscriber") String subscriber,
-            @RequestParam(value = "topic") String topic) {
-
-        subscriptionService.unsubscribe(subscriber, topic);
-        return TResult.success("Success to unsubscribe topic");
-    }
-
-    @ApiOperation(value = "查看某个用户的订阅主题", notes = "返回订阅列表")
-    @RequestMapping(value = "", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<TSubscription> listSubscriptions(
-            @RequestParam(value = "subscriber") String subscriber) {
-
-        return ConverterContext.getConverter(SubscriptionConverter.class)
-                .convert(subscriptionService.listSubscriptions(subscriber));
-    }
 }

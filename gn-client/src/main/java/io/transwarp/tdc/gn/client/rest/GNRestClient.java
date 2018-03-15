@@ -9,25 +9,36 @@ import java.util.List;
  */
 public interface GNRestClient {
 
-    TMetaInfo getMetaInfo();
+//    TMetaInfo getMetaInfo();
 
     TConsumerOffset fetchOffset(String topic, String subscriber);
 
-    TResult commitOffset(TOffsetCommit offsetCommit);
+    TResult commitOffset(String topic, String subscriber, TOffsetCommit offsetCommit);
 
-    TRecord consumeOne(String topic, String subscriber, Boolean autoCommit);
-
-    List<TRecord> consumeBatch(String topic, String subscriber, Integer count, Boolean autoCommit);
+    TRecords consume(String topic, String subscriber, Integer count, String user);
 
     TResult produce(String topic, TPayload payload, Boolean ensureSuccess);
 
-    TResult subscribe(String subscriber, String topic);
+    TResult subscribe(String topic, String subscriber, String user);
 
-    TResult unsubscribe(String subscriber, String topic);
+    TResult unsubscribe(String topic, String subscriber);
 
     List<TSubscription> listSubscriptions(String subscriber);
+
+    Void heartbeat(String topic, String subscriber, String user);
 
     List<TTopic> listTopics();
 
     TTopic getTopic(String name);
+
+    /**
+     * temporarily leave the topic, which is different from the unsubscribe()
+     * method,
+     * this method will only impact if the client is the master to consume a topic
+     * @param topic
+     * @param subscriber
+     * @param user
+     * @return
+     */
+    TResult leave(String topic, String subscriber, String user);
 }

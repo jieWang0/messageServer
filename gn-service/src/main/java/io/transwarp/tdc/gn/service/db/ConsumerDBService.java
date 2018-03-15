@@ -1,15 +1,19 @@
 package io.transwarp.tdc.gn.service.db;
 
-import io.transwarp.tdc.dlock.annotation.DLockAcquired;
+import io.transwarp.tdc.dlock.annotation.DLockMayAcquired;
+import io.transwarp.tdc.dlock.model.DLock;
+import io.transwarp.tdc.dlock.service.DLockContext;
 import io.transwarp.tdc.gn.dlock.GNLockType;
 import io.transwarp.tdc.gn.model.ConsumerOffset;
 import io.transwarp.tdc.gn.model.Record;
+import io.transwarp.tdc.gn.model.Records;
+import io.transwarp.tdc.gn.repository.ConsumerOffsetRepo;
 import io.transwarp.tdc.gn.repository.RecordRepo;
-import io.transwarp.tdc.gn.service.ConsumerOffsetService;
 import io.transwarp.tdc.gn.service.ConsumerService;
 import io.transwarp.tdc.gn.service.condition.DatabaseImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
 
@@ -22,77 +26,89 @@ import java.util.List;
 @Conditional(DatabaseImpl.class)
 @Service
 public class ConsumerDBService implements ConsumerService {
+    private static final int DEFAULT_CONSUMER_EXPIRE_MILLIS = 30 * 1000; // 30 seconds
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConsumerDBService.class);
 
     @Resource(name = "recordDBRepo")
     private RecordRepo recordRepo;
 
-    @Resource(name = "consumerOffsetDBService")
-    private ConsumerOffsetService consumerOffsetService;
+    @Resource(name = "consumerOffsetDBRepo")
+    private ConsumerOffsetRepo consumerOffsetRepo;
 
-    @DLockAcquired(lockName = GNLockType.CONSUME_RECORD_VALUE)
+    @Resource
+    private DLockContext lockContext;
+
+    @DLockMayAcquired(lockName = GNLockType.CONSUME_RECORD_VALUE)
     @Override
-    public Record consume(String topic, String subscriber, boolean autoCommit) {
-        ConsumerOffset consumerOffset = consumerOffsetService.fetch(topic, subscriber);
+    public Records consumeBatch(String topic, String subscriber, Integer count, String user) {
+        ConsumerOffset consumerOffset = consumerOffsetRepo.findOneByTopicAndSubscriber(topic, subscriber);
 
-        long preOffset = consumerOffset.getCurrentOffset();
-        LOGGER.debug("Subscriber[{}] start to consume topic[{}] one after offset[{}]", subscriber, topic, preOffset);
-
-        // 获取当前订阅者最新未消费的一条记录
-        Record record = recordRepo.findOneByTopicAndOffset(topic, preOffset);
-        if (record == null) {
-            LOGGER.debug("Subscriber[{}] consume nothing on topic[{}] after offset[{}]", subscriber, topic, preOffset);
-            return null;
+        DLock lock = lockContext.getDLock();
+        if (lock == null) {
+            LOGGER.debug("Lock not acquired, returns empty record set");
+            return Records.empty(isSameUser(user, consumerOffset.getLastUser()), true);
         }
 
-        if (autoCommit) {
-            consumerOffsetService.commit(topic, subscriber, record.getOffset());
-            LOGGER.debug("Auto commit offset[{}], subscriber[{}], topic[{}] for one", record.getOffset(), subscriber, topic);
-        }
-
-        return record;
-    }
-
-    @DLockAcquired(lockName = GNLockType.CONSUME_RECORD_VALUE)
-    @Override
-    public List<Record> consumeBatch(String topic, String subscriber, Integer count, boolean autoCommit) {
         if (count != null && count < 0) {
             LOGGER.warn("Count less than zero is regarded as consume all");
             count = null;
         }
 
-        ConsumerOffset consumerOffset = consumerOffsetService.fetch(topic, subscriber);
+        // check if the user is same as last consumption
+        if (!shouldConsume(consumerOffset, user)) {
+            return Records.empty(false, false);
+        }
 
         long preOffset = consumerOffset.getCurrentOffset();
         LOGGER.debug("Subscriber[{}] start to consume topic[{}] batch after offset[{}]", subscriber, topic, preOffset);
 
         List<Record> records = recordRepo.findByTopicAndOffset(topic, preOffset, count);
 
-        //当读取到内容并且自动commit的时候需要更新offset
-        if (!records.isEmpty() && autoCommit) {
-            long commitOffset = calCommitOffset(records);
-
-            consumerOffsetService.commit(topic, subscriber, commitOffset);
-            LOGGER.debug("Auto commit offset[{}], subscriber[{}], topic[{}] for batch", commitOffset, subscriber, topic);
-        }
-
-        return records;
+        return Records.data(records);
     }
 
-    private long calCommitOffset(List<Record> records) {
-        if (records == null || records.isEmpty()) {
-            return -1;
-        }
+    private boolean isSameUser(String user1, String user2) {
+        return user1 != null && user2 != null && user1.equals(user2);
+    }
 
-        // 查看最大的一个offset, 理论上返回值是有序的, 最后一个就行了
-        long commitOffset = records.get(records.size() - 1).getOffset();
-        for (Record record : records) {
-            if (record.getOffset() > commitOffset) {
-                commitOffset = record.getOffset();
-            }
+    @Override
+    public void heartbeat(String topic, String subscriber, String user) {
+        LOGGER.debug("Heartbeat for topic {} subscriber {} from user {}", topic, subscriber, user);
+        ConsumerOffset consumerOffset = consumerOffsetRepo.findOneByTopicAndSubscriber(topic, subscriber);
+        if (consumerOffset != null && isSameUser(consumerOffset.getLastUser(), user)) {
+            consumerOffsetRepo.updateLastActiveTime(topic, subscriber, System.currentTimeMillis());
         }
+    }
 
-        return commitOffset;
+    @Override
+    public void leave(String topic, String subscriber, String user) {
+        LOGGER.debug("User[{}] leaves group[{}] upon tipic[{}]", user, subscriber, topic);
+        ConsumerOffset consumerOffset = consumerOffsetRepo.findOneByTopicAndSubscriber(topic, subscriber);
+        if (consumerOffset.getLastUser() != null && consumerOffset.getLastUser().equals(user)) {
+
+        }
+    }
+
+    private boolean shouldConsume(ConsumerOffset consumerOffset, String user) {
+        if (consumerOffset == null) {
+            // no offset for given subscriber and topic
+            return false;
+        }
+        if (user == null) {
+            // not specify user means to consume no matter who
+            return true;
+        }
+        if (consumerOffset.getLastUser() == null) {
+            // the previous user is unknown, can consume
+            return true;
+        }
+        if (consumerOffset.getLastUser().equalsIgnoreCase(user)) {
+            return true;
+        }
+        if (consumerOffset.getLastActiveTime() < System.currentTimeMillis() - DEFAULT_CONSUMER_EXPIRE_MILLIS) {
+            return true;
+        }
+        return false;
     }
 }

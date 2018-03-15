@@ -26,4 +26,11 @@ public interface ConsumerOffsetMapper extends BaseMapper<ConsumerOffset> {
             "where subscriber = #{subscriber} and topic = #{topic}")
     void deleteByTopicAndSubscriber(@Param("topic") String topic,
                                     @Param("subscriber") String subscriber);
+
+    @Update("update consumer_offset " +
+            "set last_active_time = #{currentTime} " +
+            "where topic = #{topic} and subscriber = #{subscriber}")
+    void updateLastActiveTime(@Param("topic") String topic,
+                              @Param("subscriber") String subscriber,
+                              @Param("currentTime") long currentTime);
 }
