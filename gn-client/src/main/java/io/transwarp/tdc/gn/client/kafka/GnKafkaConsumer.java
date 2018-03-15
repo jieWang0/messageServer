@@ -111,6 +111,10 @@ public class GnKafkaConsumer<T> implements Consumer<T> {
         properties.put("bootstrap.servers",configs.get(KafkaConsumerConfig.SERVER_LOCATION));
         properties.put("group.id",configs.get("group"));
       //  properties.put("max.partition.fetch.bytes","100");
+
+        if(configs.containsKey(KafkaConsumerConfig.MAX_FETCH_BYTES))
+            properties.put("max.partition.fetch.bytes",configs.get(KafkaConsumerConfig.MAX_FETCH_BYTES));
+        
         if(configs.containsKey(KafkaConsumerConfig.MAX_POLL_RECORDS))
              properties.put("max.poll.records",configs.get(KafkaConsumerConfig.MAX_POLL_RECORDS));
 
