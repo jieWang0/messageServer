@@ -22,6 +22,13 @@ public class DBConsumerConfig extends AbstractConsumerConfig {
     // consumer所在的group
     public static final String CONSUMER_GROUP = PREFIX + "group";
 
+    public static final String CONSUMER_USER = PREFIX + "user";
+
     // 消费完之后是否自动提交
     public static final String AUTO_COMMIT_ENABLE = PREFIX + "auto-commit.enable";
+
+    /**
+     * application context for runtime
+     */
+    public static final String CONSUMER_APPLICATION_CONTEXT = PREFIX + "application.context";
 }

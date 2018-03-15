@@ -44,7 +44,7 @@ public class SubscriptionDBService implements SubscriptionService {
 
     @Transactional
     @Override
-    public void subscribe(String subscriber, String topic) {
+    public void subscribe(String subscriber, String topic, String user) {
         if (topicRepo.findOne(topic) == null) {
             throw new GNException(ErrorCode.TOPIC_NOT_FOUND,
                 String.format("Topic[name=%s] is not found, cannot subscribe", topic));
@@ -55,10 +55,10 @@ public class SubscriptionDBService implements SubscriptionService {
             return;
         }
 
-        long subscribeTime = new Date().getTime();
+        long subscribeTime = System.currentTimeMillis();
 
         createSubscription(topic, subscriber, subscribeTime);
-        createConsumerOffset(topic, subscriber, subscribeTime);
+        createConsumerOffset(topic, subscriber, subscribeTime, user);
 
         LOGGER.info("Subscriber[{}] success to subscribe topic[{}]", subscriber, topic);
     }
@@ -89,12 +89,14 @@ public class SubscriptionDBService implements SubscriptionService {
         subscriptionRepo.save(subscription);
     }
 
-    private void createConsumerOffset(String topic, String subscriber, long subscribeTime) {
+    private void createConsumerOffset(String topic, String subscriber, long subscribeTime, String user) {
         ConsumerOffset consumerOffset = new ConsumerOffset();
         consumerOffset.setTopic(topic);
         consumerOffset.setSubscriber(subscriber);
         consumerOffset.setCommitTime(subscribeTime);
         consumerOffset.setCurrentOffset(fetchStartOffset(topic));
+        consumerOffset.setLastUser(user);
+        consumerOffset.setLastActiveTime(subscribeTime);
 
         if (consumerOffsetRepo.findOneByTopicAndSubscriber(subscriber, topic) != null) {
             LOGGER.warn("Subscriber[{}] has consumerOffset on topic[{}] before subscribe(should never happen)", subscriber, topic);

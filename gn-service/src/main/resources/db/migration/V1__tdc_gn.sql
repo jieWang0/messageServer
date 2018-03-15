@@ -16,6 +16,10 @@ CREATE TABLE `consumer_offset` (
   COMMENT '当前消费的位置',
   `commit_time`    BIGINT(20)  NOT NULL
   COMMENT '消费时间',
+  `last_user`      VARCHAR(45) NULL
+  COMMENT '',
+  `last_active_time` LONG NOT NULL
+  COMMENT '',
   UNIQUE KEY `index1` (`topic`, `subscriber`)
 )
   ENGINE = InnoDB

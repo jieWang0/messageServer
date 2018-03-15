@@ -14,4 +14,6 @@ public interface ConsumerOffsetRepo {
     void update(ConsumerOffset consumerOffset);
 
     void deleteByTopicAndSubscriber(String topic, String subscriber);
+
+    void updateLastActiveTime(String topic, String subscriber, long currentTime);
 }

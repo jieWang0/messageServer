@@ -23,9 +23,9 @@ public class TestMetaInfo {
         client = GNRestClientFactory.create(config);
     }
 
-    @Test
-    public void testMetaInfo() {
-        TMetaInfo metaInfo = client.getMetaInfo();
-        System.out.println(metaInfo);
-    }
+//    @Test
+//    public void testMetaInfo() {
+//        TMetaInfo metaInfo = client.getMetaInfo();
+//        System.out.println(metaInfo);
+//    }
 }

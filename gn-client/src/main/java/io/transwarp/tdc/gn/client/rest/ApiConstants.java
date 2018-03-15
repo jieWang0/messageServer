@@ -13,20 +13,27 @@ final class ApiConstants {
 
     // consumer相关api
     public static final String CONSUMER = API_VERSION +  "/consumers";
-    public static final String CONSUMER_OFFSET = CONSUMER + "/offsets";
-    public static final String CONSUMER_OFFSET_COMMIT = CONSUMER + "/offsets/commit";
-    public static final String CONSUMER_RECORDS_ONCE = CONSUMER + "/records/once";
-    public static final String CONSUMER_RECORDS_BATCH = CONSUMER + "/records/batch";
+    public static final String CONSUMER_OFFSET = CONSUMER + "/{subscriber}/topics/{topic}/offsets";
+    public static final String CONSUMER_OFFSET_COMMIT = CONSUMER + "/{subscriber}/topics/{topic}/commitments";
+    public static final String CONSUMER_RECORDS = CONSUMER + "/{subscriber}/topics/{topic}/records";
+//    public static final String CONSUMER_RECORDS_BATCH = CONSUMER + "/records/batch";
+    public static final String CONSUMER_HEARTBEAT = CONSUMER + "/{subscriber}/topics/{topic}/heartbeat";
 
     // producer相关api
     public static final String PRODUCER = API_VERSION + "/producers";
     public static final String PRODUCER_SEND = PRODUCER + "/{topic}";
 
     // subscription相关api
-    public static final String SUBSCRIPTIONS = API_VERSION + "/subscriptions";
-    public static final String SUBSCRIPTIONS_LIST = SUBSCRIPTIONS;
-    public static final String SUBSCRIPTIONS_SUBSCRIBE = SUBSCRIPTIONS + "/subscribe";
-    public static final String SUBSCRIPTIONS_UNSUBSCRIBE = SUBSCRIPTIONS + "/unsubscribe";
+//    public static final String SUBSCRIPTIONS = API_VERSION + "/subscriptions";
+//    public static final String SUBSCRIPTIONS_LIST = SUBSCRIPTIONS;
+//    public static final String SUBSCRIPTIONS_SUBSCRIBE = SUBSCRIPTIONS + "/subscribe";
+//    public static final String SUBSCRIPTIONS_UNSUBSCRIBE = SUBSCRIPTIONS + "/unsubscribe";
+
+    public static final String CONSUMER_SUBSCRIBE = CONSUMER + "/{subscriber}/topics/{topic}";
+    public static final String CONSUMER_UNSUBSCRIBE = CONSUMER + "/{subscriber}/topics/{topic}";
+    public static final String CONSUMER_SUBSCRIPTIONS = CONSUMER + "/{subscriber}/topics";
+
+    public static final String CONSUMER_LEAVE = CONSUMER + "/{subscriber}/topics/{topic}/users/{user}";
 
     // topic相关api
     public static final String TOPIC = API_VERSION + "/topics";

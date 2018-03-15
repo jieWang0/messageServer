@@ -36,4 +36,9 @@ public class ConsumerOffsetDBRepo implements ConsumerOffsetRepo {
     public void deleteByTopicAndSubscriber(String topic, String subscriber) {
         consumerOffsetMapper.deleteByTopicAndSubscriber(topic, subscriber);
     }
+
+    @Override
+    public void updateLastActiveTime(String topic, String subscriber, long currentTime) {
+        consumerOffsetMapper.updateLastActiveTime(topic, subscriber, currentTime);
+    }
 }
