@@ -1,5 +1,5 @@
-FROM 172.16.1.99/transwarp/guardian-plugins:transwarp-5.1
-MAINTAINER zhe.jiang@transwarp.io
+FROM 172.16.1.99/ts/guardian-plugins:ts-5.1
+MAINTAINER zhe.jiang@ts.io
 
 WORKDIR /root
 

@@ -2,9 +2,9 @@
 <!DOCTYPE mapper
     PUBLIC "-//mybatis.org//DTD 3.0//EN"
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="io.transwarp.tdc.gn.mapper.RecordMapper">
+<mapper namespace="io.ts.tdc.gn.mapper.RecordMapper">
     
-    <resultMap id="record" type="io.transwarp.tdc.gn.model.Record">
+    <resultMap id="record" type="io.ts.tdc.gn.model.Record">
         <id property="id" column="id"/>
         <result property="offset" column="offset"/>
         <result property="topic" column="topic"/>

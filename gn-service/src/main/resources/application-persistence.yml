@@ -1,12 +1,12 @@
 mybatis:
   mapper-locations: classpath:mapper/*.xml
-  type-aliases-package: io.transwarp.tdc.gn.model
+  type-aliases-package: io.ts.tdc.gn.model
   configuration:
     map-underscore-to-camel-case: true
 
 mapper:
   mappers:
-    - io.transwarp.mangix.web.mybatis.BaseMapper
+    - io.ts.mangix.web.mybatis.BaseMapper
 
 pagehelper:
   support-methods-arguments: true

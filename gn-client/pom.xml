@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>gn-parent</artifactId>
-        <groupId>io.transwarp.tdc.gn</groupId>
+        <groupId>io.ts.tdc.gn</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -14,7 +14,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>io.transwarp.tdc.gn</groupId>
+            <groupId>io.ts.tdc.gn</groupId>
             <artifactId>gn-common</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
@@ -25,16 +25,16 @@
             <version>0.10.2.0</version>
         </dependency>
 
-        <!-- transwarp web common library http://172.16.1.41:10080/TDC/mangix.git -->
+        <!-- ts web common library http://172.16.1.41:10080/TDC/mangix.git -->
         <dependency>
-            <groupId>io.transwarp</groupId>
+            <groupId>io.ts</groupId>
             <artifactId>mangix-web-common</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
         <!-- rest client with tracing -->
         <dependency>
-            <groupId>io.transwarp.tdc.tracing</groupId>
+            <groupId>io.ts.tdc.tracing</groupId>
             <artifactId>tracing-retrofit</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>

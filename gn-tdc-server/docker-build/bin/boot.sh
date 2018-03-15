@@ -13,7 +13,7 @@ echo "options use-vc" >>/etc/resolv.conf
 export GN_TDC_CONFD_DIR=${GN_TDC_CONFD_DIR:-/var/lib/gn/confd}
 export GN_TDC_SERVER_PORT=${GN_TDC_SERVER_PORT:-9042}
 export CAS_JKS_PATH=${CAS_JKS_PATH:-/var/lib/gn/lib/trusted.jks}
-export CAS_PASSWD=${CAS_PASSWD:-Transwarp01!}
+export CAS_PASSWD=${CAS_PASSWD:-ts01!}
 export GN_TDC_TXSQL_SERVER=${GN_TDC_TXSQL_SERVER:-localhost}
 export GN_TDC_TXSQL_USERNAME=${GN_TDC_TXSQL_USERNAME:-}
 export GN_TDC_TXSQL_PASSWORD=${GN_TDC_TXSQL_PASSWORD:-}

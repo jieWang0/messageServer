@@ -1,7 +1,7 @@
-package io.transwarp.tdc.notif.server;
+package io.ts.tdc.notif.server;
 
-import io.transwarp.tdc.notif.server.kafkanotification.service.impl.NgConsumerService;
-import io.transwarp.tdc.notif.server.kafkanotification.service.impl.NgProducerService;
+import io.ts.tdc.notif.server.kafkanotification.service.impl.NgConsumerService;
+import io.ts.tdc.notif.server.kafkanotification.service.impl.NgProducerService;
 import kafka.server.KafkaServer;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;

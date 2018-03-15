@@ -1,4 +1,4 @@
-image: 172.16.1.99/transwarp/base/builder:centos7
+image: 172.16.1.99/ts/base/builder:centos7
 
 before_script:
     - time=`date "+%Y-%m-%d-%H-%M-%S"`
@@ -43,10 +43,10 @@ postcommit_build:
     - set -ex
     - sleep 90s
     - export BUILDER="postcommit"
-    - export releaseStagingId="priv-transwarp-lib"
+    - export releaseStagingId="priv-ts-lib"
     - export releaseRepoName="libs-release-local"
     - export releaseRepoUrl="http://172.16.1.161:30033/repository/libs-release-local"
-    - export snapStagingId="priv-transwarp-snapshots"
+    - export snapStagingId="priv-ts-snapshots"
     - export snapRepoName="libs-snapshot"
     - export snapRepoUrl="http://172.16.1.161:30033/repository/libs-snapshot-local"
     - git clone http://gitlab-ci-token:${CI_JOB_TOKEN}@172.16.1.41:10080/InfraTools/packageRelease.git script
@@ -71,10 +71,10 @@ gold_build:
     - set -ex
     - sleep 90s
     - export BUILDER="gold"
-    - export releaseStagingId="public-transwarp-release"
+    - export releaseStagingId="public-ts-release"
     - export releaseRepoName="libs-release-local"
     - export releaseRepoUrl="http://172.16.1.168:8081/artifactory/libs-release-local"
-    - export snapStagingId="public-transwarp-snapshots"
+    - export snapStagingId="public-ts-snapshots"
     - export snapRepoName="libs-snapshot"
     - export snapRepoUrl="http://172.16.1.168:8081/artifactory/libs-snapshot-local"
     - git clone http://gitlab-ci-token:${CI_JOB_TOKEN}@172.16.1.41:10080/InfraTools/packageRelease.git script
