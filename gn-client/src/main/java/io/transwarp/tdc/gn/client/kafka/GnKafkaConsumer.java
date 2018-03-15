@@ -1,13 +1,16 @@
 package io.transwarp.tdc.gn.client.kafka;
 
 import io.transwarp.tdc.gn.client.consume.Consumer;
+import io.transwarp.tdc.gn.client.consume.ConsumerArgs;
 import io.transwarp.tdc.gn.common.NotificationConsumerRecord;
 import io.transwarp.tdc.gn.common.GnTopicPartition;
+import io.transwarp.tdc.gn.common.NotificationConsumerRecords;
 import org.apache.kafka.clients.consumer.CommitFailedException;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.common.serialization.Deserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,27 +20,24 @@ public class GnKafkaConsumer<T> implements Consumer<T> {
     private String group;
     private String topic;
     private KafkaConsumer<String,T> consumer;
+    private Deserializer<T> keyDeserializer;
+    private Deserializer<T> valueDeserializer;
+
     private static final Logger logger = LoggerFactory.getLogger(GnKafkaConsumer.class);
-    public GnKafkaConsumer(Map<String, Object> configs) {
-        if (configs.get("group") == null || configs.get("topic") == null) {
+    public GnKafkaConsumer(ConsumerArgs consumerArgs,String url) {
+        if (consumerArgs.getGroup() == null || consumerArgs.getTopic() == null) {
             throw new IllegalArgumentException("GnKafkaConsumer either topic or group cannot be null");
         }
-        this.topic = (String) configs.get("topic");
-        this.group = (String) configs.get("group");
+        this.topic = consumerArgs.getTopic();
+        this.group = consumerArgs.getGroup();
+        this.keyDeserializer = (Deserializer<T>) consumerArgs.getAdditionalArgs().get("keyDeserializer");
+        this.valueDeserializer = (Deserializer<T>) consumerArgs.getAdditionalArgs().get("valueDeserializer");
+        this.consumer = getKafkaConsumerInstance(consumerArgs);
 
-        if (configs.get(KafkaConsumerConfig.SERVER_LOCATION) == null) {
-            throw new IllegalArgumentException("GnKafkaConsumer server location is not configured");
-        }
-        this.consumer = getKafkaConsumerInstance(configs);
     }
 
     @Override
-    public NotificationConsumerRecord<T> pollOnce(long timeoutMillis) {
-        return null;
-    }
-
-    @Override
-    public List<NotificationConsumerRecord<T>> poll(long timeoutMillis) {
+    public NotificationConsumerRecords<T> poll(long timeoutMillis) {
         ConsumerRecords<String,T> consumerRecords = this.consumer.poll(timeoutMillis);
         return records(consumerRecords);
     }
@@ -86,46 +86,63 @@ public class GnKafkaConsumer<T> implements Consumer<T> {
         return this.consumer.position(new TopicPartition(topic,partition));
     }
 
-    private List<NotificationConsumerRecord<T>> records(ConsumerRecords<String,T> records) {
-        List<NotificationConsumerRecord<T>> formatRecords = new ArrayList<>();
-        for (ConsumerRecord<String, T> record : records) {
-            formatRecords.add(new KafkaConsumerRecord.Builder<T>()
+    private NotificationConsumerRecords<T> records(ConsumerRecords<String,T> records) {
+        return records == null ?
+                () -> new EmptyIter<>() :
+                () -> new KafkaRecordsIter<>(records, group);
+    }
+
+    private static class KafkaRecordsIter<T> implements Iterator<NotificationConsumerRecord<T>> {
+        private Iterator<ConsumerRecord<String,T> > iter;
+        private String group;
+
+        KafkaRecordsIter(ConsumerRecords<String,T> records,String group) {
+            this.iter = records.iterator();
+            this.group = group;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return iter.hasNext();
+        }
+
+        @Override
+        public NotificationConsumerRecord<T> next() {
+            ConsumerRecord<String,T> record = iter.next();
+            return new KafkaConsumerRecord.Builder<T>()
                     .createTime(record.timestamp())
                     .partition(record.partition())
                     .offset(record.offset())
                     .playLoad(record.value())
                     .topic(record.topic())
-                    .build());
+                    .group(group)
+                    .build();
         }
-        return formatRecords;
     }
 
-    private KafkaConsumer<String,T> getKafkaConsumerInstance(Map<String, Object> configs) {
+    private static class EmptyIter<T> implements Iterator<NotificationConsumerRecord<T>> {
+        @Override
+        public boolean hasNext() {
+            return false;
+        }
+
+        @Override
+        public NotificationConsumerRecord<T> next() {
+            throw new NoSuchElementException();
+        }
+    }
+
+    private KafkaConsumer<String,T> getKafkaConsumerInstance(ConsumerArgs consumerArgs) {
 
         Properties properties = new Properties();
-        if(!configs.containsKey(KafkaConsumerConfig.AUTO_COMMIT_ENABLE)) {
-            properties.put("enable.auto.commit","true");
-        } else {
-            properties.put("enable.auto.commit",String.valueOf(configs.get(KafkaConsumerConfig.AUTO_COMMIT_ENABLE)));
+        if(!consumerArgs.isAutoCommitEnabled()) {
+            properties.put("enable.auto.commit","false");
         }
-        properties.put("bootstrap.servers",configs.get(KafkaConsumerConfig.SERVER_LOCATION));
-        properties.put("group.id",configs.get("group"));
-      //  properties.put("max.partition.fetch.bytes","100");
-
-        if(configs.containsKey(KafkaConsumerConfig.MAX_FETCH_BYTES))
-            properties.put("max.partition.fetch.bytes",configs.get(KafkaConsumerConfig.MAX_FETCH_BYTES));
-        
-        if(configs.containsKey(KafkaConsumerConfig.MAX_POLL_RECORDS))
-             properties.put("max.poll.records",configs.get(KafkaConsumerConfig.MAX_POLL_RECORDS));
-
-        properties.put("key.deserializer", KafkaConsumerConfig.KEY_PAYLOAD_DESERIALIZER);
-
-        if (!configs.containsKey(KafkaConsumerConfig.VALUE_PAYLOAD_DESERIALIZER)) {
-            properties.put("value.deserializer",KafkaConsumerConfig.VALUE_PAYLOAD_DESERIALIZER);
-        } else {
-            properties.put("value.deserializer",configs.get(KafkaConsumerConfig.PAYLOAD_DESERIALIZER));
-        }
-
+        properties.put("bootstrap.servers",KafkaConsumerConfig.SERVER_LOCATION);
+        properties.put("group.id",consumerArgs.getGroup());
+        properties.put("max.poll.records",consumerArgs.getPollBatchSize());
+        properties.put("key.deserializer", this.keyDeserializer);
+        properties.put("value.deserializer",this.valueDeserializer);
         return new KafkaConsumer<>(properties);
     }
 

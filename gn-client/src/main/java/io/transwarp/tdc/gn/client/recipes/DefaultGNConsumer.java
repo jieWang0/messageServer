@@ -6,6 +6,7 @@ import io.transwarp.tdc.gn.client.consume.ConsumerArgs;
 import io.transwarp.tdc.gn.client.db.DBConsumer;
 import io.transwarp.tdc.gn.client.exception.CommitFailedException;
 import io.transwarp.tdc.gn.client.exception.ShutdownException;
+import io.transwarp.tdc.gn.client.kafka.GnKafkaConsumer;
 import io.transwarp.tdc.gn.client.meta.MetaInfoRetriever;
 import io.transwarp.tdc.gn.common.MetaInfo;
 import io.transwarp.tdc.gn.common.NotificationConsumerRecord;
@@ -89,9 +90,7 @@ public class DefaultGNConsumer<T> implements GNConsumer<T> {
 
         switch (metaInfo.getBackendType()) {
             case KAFKA:
-                configs.put(ConfigConstants.CONSUMER_SERVICE_LOCATION, metaInfo.getServerUrl());
-                // TODO: construct kafka client
-                return null;
+                return new GnKafkaConsumer<>(consumerArgs,metaInfo.getServerUrl());
             case DATABASE:
                 configs.put(ConfigConstants.CONSUMER_SERVICE_LOCATION, metaRetriever.metaInfoSource());
                 return new DBConsumer<>(consumerArgs);
