@@ -2,12 +2,10 @@ package io.transwarp.tdc.gn.client.consume;
 
 import io.transwarp.tdc.gn.client.config.GenericConfig;
 import io.transwarp.tdc.gn.client.db.DBConsumer;
-import io.transwarp.tdc.gn.client.kafka.GnKafkaConsumer;
-import io.transwarp.tdc.gn.client.kafka.KafkaConsumerConfig;
 import io.transwarp.tdc.gn.client.rest.GNRestClient;
 import io.transwarp.tdc.gn.client.rest.GNRestClientFactory;
 import io.transwarp.tdc.gn.client.rest.GNRestConfig;
-import io.transwarp.tdc.gn.common.NotificationStorageType;
+import io.transwarp.tdc.gn.common.BackendType;
 import io.transwarp.tdc.gn.common.transport.TMetaInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +21,7 @@ public class DefaultConsumerFactory<T> implements ConsumerFactory<T> {
 
     private Map<String, Object> configs;
     private GNRestClient client;
-    private NotificationStorageType type;
+    private BackendType type;
 
     public DefaultConsumerFactory(Map<String, Object> configs) {
         if (configs == null) {
@@ -44,7 +42,7 @@ public class DefaultConsumerFactory<T> implements ConsumerFactory<T> {
                 LOGGER.info("Success to create a DBConsumer");
                 break;
             case KAFKA:
-                consumer = new GnKafkaConsumer<>(configs);
+                // todo
                 break;
             default:
                 LOGGER.warn("Unknown consumer type, cannot create a consumer");
@@ -67,11 +65,10 @@ public class DefaultConsumerFactory<T> implements ConsumerFactory<T> {
 
     private void getGNType() {
         TMetaInfo metaInfo = client.getMetaInfo();
-        if (NotificationStorageType.DATABASE.name().equals(metaInfo.getType())) {
-            this.type = NotificationStorageType.DATABASE;
-        } else if (NotificationStorageType.KAFKA.name().equals(metaInfo.getType())) {
-            this.type = NotificationStorageType.KAFKA;
-            this.configs.put(KafkaConsumerConfig.SERVER_LOCATION,metaInfo.getUrl());
+        if (BackendType.DATABASE.name().equals(metaInfo.getType())) {
+            this.type = BackendType.DATABASE;
+        } else if (BackendType.KAFKA.name().equals(metaInfo.getType())) {
+            this.type = BackendType.KAFKA;
         } else {
             throw new IllegalStateException("Unknown generic notification type: " + metaInfo.getType());
         }
