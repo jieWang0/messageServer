@@ -22,12 +22,13 @@ public class GnKafkaConsumer<T> implements Consumer<T> {
     private KafkaConsumer<String,T> consumer;
     private Deserializer<T> keyDeserializer;
     private Deserializer<T> valueDeserializer;
-
+    private String url;
     private static final Logger logger = LoggerFactory.getLogger(GnKafkaConsumer.class);
     public GnKafkaConsumer(ConsumerArgs consumerArgs,String url) {
         if (consumerArgs.getGroup() == null || consumerArgs.getTopic() == null) {
             throw new IllegalArgumentException("GnKafkaConsumer either topic or group cannot be null");
         }
+        this.url = url;
         this.topic = consumerArgs.getTopic();
         this.group = consumerArgs.getGroup();
         this.keyDeserializer = (Deserializer<T>) consumerArgs.getAdditionalArgs().get("keyDeserializer");
@@ -138,7 +139,7 @@ public class GnKafkaConsumer<T> implements Consumer<T> {
         if(!consumerArgs.isAutoCommitEnabled()) {
             properties.put("enable.auto.commit","false");
         }
-        properties.put("bootstrap.servers",KafkaConsumerConfig.SERVER_LOCATION);
+        properties.put("bootstrap.servers",this.url);
         properties.put("group.id",consumerArgs.getGroup());
         properties.put("max.poll.records",consumerArgs.getPollBatchSize());
         properties.put("key.deserializer", this.keyDeserializer);
