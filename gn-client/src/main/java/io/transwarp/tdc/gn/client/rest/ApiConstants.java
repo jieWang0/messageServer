@@ -33,4 +33,6 @@ final class ApiConstants {
     public static final String TOPIC_LIST = TOPIC;
     public static final String TOPIC_GET = TOPIC + "/{name}";
 
+    //kafka实现下的producer api
+    public static final String KAFKA_PRODUCER_SEND = API_VERSION + "/{topic}";
 }

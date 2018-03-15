@@ -30,4 +30,6 @@ public interface GNRestClient {
     List<TTopic> listTopics();
 
     TTopic getTopic(String name);
+
+    TResult kafkaProduce(String topic, TPayload payload, Boolean ensureSuccess);
 }

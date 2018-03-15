@@ -1,13 +1,10 @@
 package io.transwarp.tdc.gn.client;
 
-import io.transwarp.tdc.gn.client.config.AbstractProducerConfig;
-import io.transwarp.tdc.gn.client.config.GenericConfig;
-import io.transwarp.tdc.gn.client.db.DBProducer;
-import io.transwarp.tdc.gn.client.db.DBProducerConfig;
-import io.transwarp.tdc.gn.client.db.DBProducerRecord;
+import io.transwarp.tdc.gn.client.kafka.GnKafkaProducer;
+import io.transwarp.tdc.gn.client.kafka.KafkaProducerConfig;
+import io.transwarp.tdc.gn.client.kafka.KafkaProducerRecord;
 import io.transwarp.tdc.gn.client.produce.Producer;
-import io.transwarp.tdc.gn.common.NotificationProducerRecord;
-import io.transwarp.tdc.gn.common.seder.StringPayloadSerializer;
+
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -19,28 +16,21 @@ public class TestKafkaProducer {
         Producer<String> producer;
         Map<String, Object> configs = new HashMap<>();
 
-        configs.put(GenericConfig.GN_SERVER_LOCATION, "http://localhost:8080");
-        configs.put(DBProducerConfig.SERVER_LOCATION, "http://localhost:8080");
-
-        producer = new DBProducer<>(configs);
-        String topic = "aimer";
-        NotificationProducerRecord<String> record = new DBProducerRecord<>(topic, "haahahahaha");
-
+        configs.put(KafkaProducerConfig.SERVER_LOCATION, "http://localhost:8080");
+        producer = new GnKafkaProducer<>(configs);
+        String topic = "test";
+        KafkaProducerRecord<String> record = new KafkaProducerRecord<>(topic, "haahahahaha");
         producer.send(record);
     }
 
     public void ensureSend() {
         Producer<String> producer;
         Map<String, Object> configs = new HashMap<>();
-
-        configs.put(GenericConfig.GN_SERVER_LOCATION, "http://localhost:23333");
-        configs.put(AbstractProducerConfig.PAYLOAD_SERIALIZER, new StringPayloadSerializer());
-        configs.put(DBProducerConfig.SERVER_LOCATION, "http://localhost:23333");
-
-        producer = new DBProducer<>(configs);
-        String topic = "aimer";
-        NotificationProducerRecord<String> record = new DBProducerRecord<>(topic, "haahahahaha");
-
+        configs.put("ensureSuccess", "true");
+        configs.put(KafkaProducerConfig.SERVER_LOCATION, "http://localhost:8080");
+        producer = new GnKafkaProducer<>(configs);
+        String topic = "test";
+        KafkaProducerRecord<String> record = new KafkaProducerRecord<>(topic, "haahahahaha");
         producer.send(record);
     }
 
